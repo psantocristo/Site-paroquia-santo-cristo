@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Church, Search } from 'lucide-react';
+import { Menu, X, Church, Search, Heart } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { MobileBottomNav } from './MobileBottomNav';
 
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-950/98 via-red-900/95 to-red-950/98 backdrop-blur-md border-b border-gold-400/25 shadow-lg safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#240404] border-b border-[#c5a059]/40 shadow-2xl safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 w-full">
           {/* Logo / Brand */}
@@ -107,14 +107,14 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               />
             ) : (
               <>
-                <div className="p-2 bg-gradient-to-br from-gold-400/20 to-gold-600/10 rounded-xl border border-gold-400/40 shadow-inner">
-                  <Church className="h-6 w-6 sm:h-8 sm:w-8 text-gold-400" />
+                <div className="p-2 bg-gradient-to-br from-[#e8c872]/20 to-[#c9a84c]/10 rounded-xl border border-[#c5a059]/40 shadow-inner">
+                  <Church className="h-6 w-6 sm:h-8 sm:w-8 text-[#e8c872]" />
                 </div>
                 <div>
                   <h1 className="text-white font-serif font-bold text-base sm:text-xl tracking-tight leading-tight">
                     Paróquia Senhor Santo Cristo
                   </h1>
-                  <p className="text-gold-300/90 text-[10px] sm:text-xs tracking-[0.25em] uppercase font-sans font-medium">
+                  <p className="text-[#e8c872]/90 text-[10px] sm:text-xs tracking-[0.25em] uppercase font-sans font-medium">
                     40 Anos de Fé • 1985 - 2025
                   </p>
                 </div>
@@ -128,21 +128,21 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               <button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="px-3 py-2 text-sm text-stone-200 hover:text-gold-300 font-medium tracking-wide transition-all duration-150 rounded-lg hover:bg-white/5 relative group cursor-pointer"
+                className="px-3 py-2 text-sm text-stone-100 hover:text-[#e8c872] font-semibold tracking-wide transition-all duration-150 rounded-lg hover:bg-white/10 relative group cursor-pointer"
               >
                 {item.label}
-                <span className="absolute bottom-1 left-3 right-3 h-0.5 bg-gold-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center rounded-full" />
+                <span className="absolute bottom-1 left-3 right-3 h-0.5 bg-[#e8c872] scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center rounded-full" />
               </button>
             ))}
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Search Button */}
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
-              className="text-stone-200 hover:text-gold-300 p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-gold-400/30 transition-all cursor-pointer"
+              className="text-stone-100 hover:text-[#e8c872] p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-[#c5a059]/40 transition-all cursor-pointer"
               onClick={() => {
                 window.location.pathname = '/pesquisar';
               }}
@@ -150,22 +150,23 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               aria-label="Buscar no site"
               title="Pesquisar"
             >
-              <Search size={19} />
+              <Search size={20} />
             </motion.button>
 
-            {/* Direct Campaign/Donation CTA (Desktop) */}
+            {/* Direct Oferta CTA (Desktop) */}
             <button
               onClick={() => {
                 window.location.pathname = '/campanhas';
               }}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-b from-gold-300 to-gold-500 hover:from-gold-200 hover:to-gold-400 text-red-950 font-bold text-xs sm:text-sm rounded-xl shadow-gold hover:shadow-lg transition-all duration-200 cursor-pointer border border-gold-200/50"
+              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-b from-[#e8c872] via-[#c9a84c] to-[#b58f34] hover:from-[#f3db92] hover:to-[#c9a84c] text-[#240404] font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#f5ecd0]/60 active:scale-95"
             >
-              Campanhas & Doações
+              <Heart className="h-4 w-4 fill-[#240404]" />
+              <span>Oferta</span>
             </button>
 
             {/* Mobile Hamburger Menu Button (Hidden on lg+) */}
             <button
-              className="lg:hidden text-white hover:text-gold-300 p-2 rounded-lg hover:bg-white/10 cursor-pointer"
+              className="lg:hidden text-white hover:text-[#e8c872] p-2 rounded-lg hover:bg-white/10 cursor-pointer"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               style={{ touchAction: 'manipulation' }}
               aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
@@ -182,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden py-4 border-t border-gold-400/20 bg-red-950/98 backdrop-blur-md w-full max-w-full overflow-hidden"
+              className="lg:hidden py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full overflow-hidden"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 px-2">
                 {menuItems.map((item) => (
@@ -193,7 +194,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                   >
                     <button
                       onClick={(e) => handleMobileNavigate(e, item.id)}
-                      className="block w-full text-left px-4 py-3 font-medium transition-colors duration-150 rounded-xl touch-manipulation text-stone-100 hover:text-gold-300 hover:bg-white/10 text-sm sm:text-base border-b border-white/5"
+                      className="block w-full text-left px-4 py-3 font-medium transition-colors duration-150 rounded-xl touch-manipulation text-stone-100 hover:text-[#e8c872] hover:bg-white/10 text-sm sm:text-base border-b border-white/5"
                       style={{ 
                         touchAction: 'manipulation',
                         WebkitTapHighlightColor: 'transparent',
@@ -210,9 +211,10 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                   onClick={() => {
                     window.location.pathname = '/campanhas';
                   }}
-                  className="w-full py-3 bg-gradient-to-r from-gold-400 to-gold-500 text-red-950 font-bold text-center rounded-xl shadow-gold text-sm"
+                  className="w-full py-3 bg-gradient-to-r from-[#e8c872] to-[#c9a84c] text-[#240404] font-bold text-center rounded-xl shadow-md text-sm flex items-center justify-center gap-2"
                 >
-                  Fazer Doação / Campanhas
+                  <Heart className="h-4 w-4 fill-[#240404]" />
+                  <span>Fazer uma Oferta / Dízimo</span>
                 </button>
               </div>
             </motion.nav>
