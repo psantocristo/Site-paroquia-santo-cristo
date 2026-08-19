@@ -1,5 +1,6 @@
 name = "santocristo-paroquia"
 main = "worker/index.ts"
+account_id = "93ab3972f0aec0d43c11d83b316139ec"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
