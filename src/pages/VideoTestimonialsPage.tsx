@@ -4,7 +4,6 @@ import { ArrowLeft, Play, ChevronLeft, ChevronRight, Church, Facebook, Share2, V
 import { supabase } from '../lib/supabase';
 import { VideoTestimonial } from '../lib/supabase';
 import { SEO } from '../components/ui/SEO';
-import { Footer } from '../components/layout/Footer';
 import { toast } from 'react-hot-toast';
 
 interface VideoTestimonialsPageProps {
@@ -428,8 +427,6 @@ export const VideoTestimonialsPage: React.FC<VideoTestimonialsPageProps> = ({ on
             </div>
           )}
         </main>
-
-        <Footer onNavigate={onNavigate} />
       </div>
     </>
   );
