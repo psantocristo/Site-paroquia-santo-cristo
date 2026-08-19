@@ -1,0 +1,51 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20.18.0"
+  VITE_SUPABASE_URL = "https://esbkvwfogqgcttgzsyqr.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzYmt2d2ZvZ3FnY3R0Z3pzeXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMTY4MDgsImV4cCI6MjEwMjY5MjgwOH0.HdXZK30MI9sihapoj9GIMYraXYbbFXl_BAHa9Viz5jY"
+
+# Edge Function para Sitemap dinâmico (DEVE vir ANTES do prerender)
+[[edge_functions]]
+  path = "/sitemap.xml"
+  function = "sitemap"
+
+# Edge Function para SEO (prerender para bots)
+[[edge_functions]]
+  path = "/*"
+  function = "prerender"
+
+# SPA redirect (deve vir DEPOIS da edge function)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers para SEO e cache
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[functions]
+  node_bundler = "esbuild"

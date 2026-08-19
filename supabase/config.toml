@@ -1,0 +1,22 @@
+project_id = "esbkvwfogqgcttgzsyqr"
+
+[functions.sicredi-create-pix]
+verify_jwt = false
+
+[functions.sicredi-check-status]
+verify_jwt = false
+
+[functions.sicredi-create-card]
+verify_jwt = false
+
+[functions.sicredi-webhook]
+verify_jwt = false
+
+[functions.sicredi-test-connection]
+verify_jwt = false
+
+[functions.delete-cloudinary-image]
+verify_jwt = false
+
+[functions.cloudinary-usage]
+verify_jwt = false

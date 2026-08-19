@@ -1,0 +1,311 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { MapPin, Phone, Mail, Clock, Church, MessageCircle, BookOpen, Calendar } from 'lucide-react';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { supabase, Parish, Schedule } from '../../lib/supabase';
+
+interface ContactSectionProps {
+  onNavigateToPrograms?: () => void;
+}
+
+export const ContactSection: React.FC<ContactSectionProps> = ({ onNavigateToPrograms }) => {
+  const [parishData, setParishData] = useState<Parish | null>(null);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch parish data
+      const { data: parishData } = await supabase
+        .from('parishes')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (parishData) {
+        setParishData(parishData);
+      }
+
+      // Fetch schedules
+      const { data: schedulesData } = await supabase
+        .from('schedules')
+        .select('*')
+        .eq('is_active', true)
+        .order('day_of_week', { ascending: true });
+
+      if (schedulesData) {
+        setSchedules(schedulesData);
+      }
+    } catch (error) {
+      console.error('Error fetching contact data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getDayLabel = (dayId: string) => {
+    const days: { [key: string]: string } = {
+      'sunday': 'Domingo',
+      'monday': 'Segunda',
+      'tuesday': 'Terça',
+      'wednesday': 'Quarta',
+      'thursday': 'Quinta',
+      'friday': 'Sexta',
+      'saturday': 'Sábado'
+    };
+    return days[dayId] || dayId;
+  };
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: 'Endereço',
+      content: parishData?.address || 'R. dos Têxteis, 653 - Chacara Santa Etelvina',
+      subContent: 'São Paulo - SP, 08490-582 - Cidade Tiradentes'
+    },
+    {
+      icon: Phone,
+      title: 'Telefone Fixo',
+      content: parishData?.landline_phone || '(11) 1234-5678',
+      subContent: parishData?.office_hours || 'Segunda a Sexta, 9h às 17h'
+    },
+    {
+      icon: MessageCircle,
+      title: 'WhatsApp',
+      content: parishData?.whatsapp_phone || '(11) 99999-9999',
+      subContent: 'Atendimento da Secretaria'
+    },
+    {
+      icon: Mail,
+      title: 'E-mail',
+      content: parishData?.email || 'contato@paroquiatiradentes.com.br',
+      subContent: 'Resposta em até 24h'
+    }
+  ];
+
+  const defaultSchedules = [
+    { day: 'Domingo', times: '8h00, 10h00 e 19h00' },
+    { day: 'Segunda', times: 'Sem missa' },
+    { day: 'Terça', times: '19h00' },
+    { day: 'Quarta', times: '19h00' },
+    { day: 'Quinta', times: '19h00' },
+    { day: 'Sexta', times: '19h00' },
+    { day: 'Sábado', times: '17h00' }
+  ];
+
+  if (isLoading) {
+    return (
+      <section id="contact" className="py-12 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-800 mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando informações de contato...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="contact" className="py-12 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-800 to-amber-600 bg-clip-text text-transparent mb-4">
+            Contato
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Venha nos visitar e fazer parte da nossa família paroquial
+          </p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-12 mb-16">
+          {/* Contact Information */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h3 className="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-3">
+              <Church className="h-7 w-7 text-red-800" />
+              Informações de Contato
+            </h3>
+            
+            <div className="grid sm:grid-cols-2 gap-6">
+              {contactInfo.map((info, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <Card className="p-6 h-full">
+                    <info.icon className="h-8 w-8 text-red-800 mb-4" />
+                    <h4 className="font-semibold text-gray-800 mb-2">{info.title}</h4>
+                    <p className="text-gray-700 font-medium mb-1">{info.content}</p>
+                    <p className="text-sm text-gray-600">{info.subContent}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Mass Schedule */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h3 className="text-2xl font-bold text-gray-800 mb-8">
+              Horários de Missas
+            </h3>
+            
+            <Card className="p-6">
+              <div className="space-y-4">
+                {(schedules.length > 0 ? schedules : defaultSchedules).map((schedule, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0"
+                  >
+                    <span className="font-medium text-gray-800">
+                      {schedules.length > 0 
+                        ? getDayLabel((schedule as Schedule).day_of_week) 
+                        : (schedule as { day: string }).day}
+                    </span>
+                    <div className="text-right">
+                      <span className="text-red-800 font-semibold">
+                        {schedules.length > 0 
+                          ? (schedule as Schedule).time 
+                          : (schedule as { times: string }).times}
+                      </span>
+                      {schedules.length > 0 && (schedule as Schedule).description && (
+                        <div className="text-xs text-gray-600">{(schedule as Schedule).description}</div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="mt-6 p-4 bg-gradient-to-r from-red-50 to-amber-50 rounded-lg border border-red-100"
+              >
+                <p className="text-sm text-gray-700">
+                  <strong>Nota:</strong> Em datas especiais e festividades, os horários podem sofrer alterações.
+                  Consulte nossos avisos paroquiais ou entre em contato conosco.
+                </p>
+              </motion.div>
+
+              {onNavigateToPrograms && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="mt-6"
+                >
+                  <Button
+                    onClick={onNavigateToPrograms}
+                    className="w-full"
+                    variant="secondary"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Todas as Programações
+                  </Button>
+                </motion.div>
+              )}
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Service Hours */}
+        {(parishData?.confession_hours || parishData?.spiritual_direction_hours) && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="grid md:grid-cols-2 gap-6 mb-16"
+          >
+            {parishData?.confession_hours && (
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Clock className="h-6 w-6 text-red-800" />
+                  <h3 className="text-xl font-bold text-gray-800">Horários de Confissões</h3>
+                </div>
+                <p className="text-gray-700 whitespace-pre-line">{parishData.confession_hours}</p>
+              </Card>
+            )}
+
+            {parishData?.spiritual_direction_hours && (
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <BookOpen className="h-6 w-6 text-red-800" />
+                  <h3 className="text-xl font-bold text-gray-800">Direção Espiritual</h3>
+                </div>
+                <p className="text-gray-700 whitespace-pre-line">{parishData.spiritual_direction_hours}</p>
+              </Card>
+            )}
+          </motion.div>
+        )}
+
+        {/* Map placeholder */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <Card className="p-8 text-center bg-gradient-to-br from-red-50 to-amber-50">
+            <MapPin className="h-16 w-16 text-red-800 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              Localização
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Estamos localizados no coração da Cidade Tiradentes, São Paulo.
+              Venha nos visitar e participar das nossas celebrações.
+            </p>
+            <a
+              href="https://maps.app.goo.gl/i7CEYTHvX4pAKrmR8"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block hover:bg-red-50 transition-colors duration-200 rounded-lg p-3 group"
+            >
+              <p className="text-lg font-semibold text-red-800 mb-2 group-hover:text-red-900 transition-colors">
+                R. dos Têxteis, 653 - Chacara Santa Etelvina
+              </p>
+              <p className="text-base text-gray-700 group-hover:text-gray-800 transition-colors">
+                São Paulo - SP, 08490-582 - Cidade Tiradentes
+              </p>
+              <div className="flex items-center justify-center gap-2 mt-2 text-sm text-red-600 group-hover:text-red-700 transition-colors">
+                <MapPin className="h-4 w-4" />
+                <span>Abrir no Google Maps</span>
+              </div>
+            </a>
+          </Card>
+        </motion.div>
+      </div>
+    </section>
+  );
+};

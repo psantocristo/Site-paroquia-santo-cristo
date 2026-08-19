@@ -1,0 +1,16 @@
+# Robots.txt para Paróquia Senhor Santo Cristo dos Milagres
+# https://paroquiasantocristo.com.br
+
+User-agent: *
+Allow: /
+
+# Bloquear páginas administrativas
+Disallow: /admin
+Disallow: /login
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://paroquiasantocristo.com.br/sitemap.xml
+
+# Crawl-delay (opcional, respeitar servidores)
+Crawl-delay: 1

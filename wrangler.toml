@@ -1,0 +1,16 @@
+name = "paroquia-santo-cristo"
+main = "worker/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[vars]
+SUPABASE_URL = "https://esbkvwfogqgcttgzsyqr.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzYmt2d2ZvZ3FnY3R0Z3pzeXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMTY4MDgsImV4cCI6MjEwMjY5MjgwOH0.HdXZK30MI9sihapoj9GIMYraXYbbFXl_BAHa9Viz5jY"
+BASE_URL = "https://paroquiasantocristo.com.br"
+VITE_SUPABASE_URL = "https://esbkvwfogqgcttgzsyqr.supabase.co"
+VITE_SUPABASE_PROJECT_ID = "esbkvwfogqgcttgzsyqr"
