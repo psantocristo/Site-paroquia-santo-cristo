@@ -10,6 +10,7 @@ const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3Mi
 const DEFAULT_BASE_URL = 'https://paroquiasantocristo.com.br';
 const DEFAULT_IMAGE = 'https://paroquiasantocristo.com.br/capa.webp';
 const SITE_NAME = 'Paróquia Senhor Santo Cristo dos Milagres';
+const DEFAULT_DESCRIPTION = 'Site Oficial da Paróquia Senhor Santo Cristo dos Milagres em Cidade Tiradentes - SP. Celebrações, avisos, pastorais, horários de missas e campanhas de doação.';
 
 function isBot(userAgent: string): boolean {
   const bots = [
@@ -66,12 +67,16 @@ interface PageData {
   description: string;
   image: string;
   url: string;
-  type: string;
+  type?: string;
 }
 
 function generateHTML(data: PageData): string {
   const safeTitle = escapeHtml(data.title);
   const safeDescription = escapeHtml(data.description);
+  const safeImage = escapeHtml(data.image || DEFAULT_IMAGE);
+  const safeUrl = escapeHtml(data.url);
+  const safeType = data.type === 'article' ? 'article' : 'website';
+
   return (
     '<!DOCTYPE html>' +
     '<html lang="pt-BR"><head>' +
@@ -79,45 +84,54 @@ function generateHTML(data: PageData): string {
     '<meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
     '<title>' + safeTitle + '</title>' +
     '<meta name="description" content="' + safeDescription + '" />' +
-    '<link rel="canonical" href="' + data.url + '" />' +
-    '<meta property="og:type" content="' + (data.type === 'article' ? 'article' : 'website') + '" />' +
-    '<meta property="og:url" content="' + data.url + '" />' +
+    '<link rel="canonical" href="' + safeUrl + '" />' +
+    '<!-- OpenGraph Meta Tags -->' +
+    '<meta property="og:type" content="' + safeType + '" />' +
+    '<meta property="og:url" content="' + safeUrl + '" />' +
     '<meta property="og:title" content="' + safeTitle + '" />' +
     '<meta property="og:description" content="' + safeDescription + '" />' +
-    '<meta property="og:image" content="' + data.image + '" />' +
+    '<meta property="og:image" content="' + safeImage + '" />' +
+    '<meta property="og:image:secure_url" content="' + safeImage + '" />' +
     '<meta property="og:site_name" content="' + SITE_NAME + '" />' +
+    '<meta property="og:locale" content="pt_BR" />' +
+    '<!-- Twitter Card Meta Tags -->' +
     '<meta name="twitter:card" content="summary_large_image" />' +
     '<meta name="twitter:title" content="' + safeTitle + '" />' +
     '<meta name="twitter:description" content="' + safeDescription + '" />' +
-    '<meta name="twitter:image" content="' + data.image + '" />' +
+    '<meta name="twitter:image" content="' + safeImage + '" />' +
     '</head><body style="font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6;">' +
     '<h1>' + safeTitle + '</h1>' +
     '<p>' + safeDescription + '</p>' +
-    '<img src="' + data.image + '" alt="' + safeTitle + '" style="max-width: 100%; border-radius: 8px;" />' +
-    '<p><a href="' + data.url + '">Acessar no site da Paróquia</a></p>' +
+    '<img src="' + safeImage + '" alt="' + safeTitle + '" style="max-width: 100%; border-radius: 8px;" />' +
+    '<p><a href="' + safeUrl + '">Acessar no site da Paróquia</a></p>' +
     '</body></html>'
   );
 }
 
-async function handleSitemap(env: Env): Promise<Response> {
-  const baseUrl = env.BASE_URL || DEFAULT_BASE_URL;
+async function handleSitemap(env: Env, requestUrl: string): Promise<Response> {
+  const urlObj = new URL(requestUrl);
+  const baseUrl = (env.BASE_URL && !env.BASE_URL.includes('workers.dev')) ? env.BASE_URL : urlObj.origin;
   const today = new Date().toISOString().split('T')[0];
-  const [blogPosts, albums, announcements, campaigns] = await Promise.all([
+
+  const [blogPosts, albums, announcements, campaigns, programs] = await Promise.all([
     fetchSupabase('blog_posts?is_published=eq.true&select=slug,updated_at', env),
     fetchSupabase('photo_albums?is_active=eq.true&select=slug,updated_at', env),
     fetchSupabase('parish_announcements?is_published=eq.true&select=slug,updated_at', env),
     fetchSupabase('campaigns?is_published=eq.true&select=slug,updated_at', env),
+    fetchSupabase('programs?is_active=eq.true&select=slug,updated_at', env),
   ]);
 
   let xml =
     '<?xml version="1.0" encoding="UTF-8"?>' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
-    '<url><loc>' + baseUrl + '</loc><lastmod>' + today + '</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>' +
+    '<url><loc>' + baseUrl + '/</loc><lastmod>' + today + '</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>' +
     '<url><loc>' + baseUrl + '/festa-padroeiro</loc><lastmod>' + today + '</lastmod><priority>0.8</priority></url>' +
-    '<url><loc>' + baseUrl + '/programacoes</loc><lastmod>' + today + '</lastmod><priority>0.8</priority></url>' +
+    '<url><loc>' + baseUrl + '/programacoes</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>' +
+    '<url><loc>' + baseUrl + '/avisos</loc><lastmod>' + today + '</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>' +
+    '<url><loc>' + baseUrl + '/campanhas</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>' +
     '<url><loc>' + baseUrl + '/galeria-dos-padres</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>' +
     '<url><loc>' + baseUrl + '/documentacoes</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>' +
-    '<url><loc>' + baseUrl + '/campanhas</loc><lastmod>' + today + '</lastmod><priority>0.8</priority></url>';
+    '<url><loc>' + baseUrl + '/eventos-informativos</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>';
 
   if (Array.isArray(blogPosts)) {
     for (const post of blogPosts) {
@@ -147,6 +161,13 @@ async function handleSitemap(env: Env): Promise<Response> {
       }
     }
   }
+  if (Array.isArray(programs)) {
+    for (const p of programs) {
+      if (p && p.slug) {
+        xml += '<url><loc>' + baseUrl + '/programacao/' + p.slug + '</loc><lastmod>' + (p.updated_at ? p.updated_at.split('T')[0] : today) + '</lastmod><priority>0.8</priority></url>';
+      }
+    }
+  }
   xml += '</urlset>';
 
   return new Response(xml, {
@@ -162,12 +183,13 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const userAgent = request.headers.get('user-agent') || '';
-    const baseUrl = env.BASE_URL || DEFAULT_BASE_URL;
+    const baseUrl = (env.BASE_URL && !env.BASE_URL.includes('workers.dev')) ? env.BASE_URL : url.origin;
 
     if (pathname === '/sitemap.xml') {
-      return handleSitemap(env);
+      return handleSitemap(env, request.url);
     }
 
+    // Bot Crawler prerendering with full OpenGraph / Twitter Cards
     if (isBot(userAgent)) {
       if (pathname.startsWith('/blog/')) {
         const slug = pathname.replace('/blog/', '').split('/')[0];
@@ -207,7 +229,7 @@ export default {
 
       if (pathname.startsWith('/campanha/')) {
         const slug = pathname.replace('/campanha/', '').split('/')[0];
-        const data = await fetchSupabase('campaigns?slug=eq.' + slug + '&is_published=eq.true&select=*', env);
+        const data = await fetchSupabase('campaigns?slug=eq.' + slug + '&is_active=eq.true&select=*', env);
         if (data && data.length > 0) {
           const c = data[0];
           return new Response(
@@ -239,6 +261,98 @@ export default {
             { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
           );
         }
+      }
+
+      if (pathname.startsWith('/programacao/')) {
+        const slug = pathname.replace('/programacao/', '').split('/')[0];
+        const data = await fetchSupabase('programs?slug=eq.' + slug + '&is_active=eq.true&select=*', env);
+        if (data && data.length > 0) {
+          const p = data[0];
+          return new Response(
+            generateHTML({
+              title: p.title + ' | Programações - ' + SITE_NAME,
+              description: truncate(stripHtml(p.description || ('Horário: ' + p.time)), 160),
+              image: p.featured_image || DEFAULT_IMAGE,
+              url: baseUrl + '/programacao/' + slug,
+              type: 'article',
+            }),
+            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          );
+        }
+      }
+
+      // Institutional static routes for bots
+      if (pathname === '/campanhas') {
+        return new Response(
+          generateHTML({
+            title: 'Campanhas & Doações | ' + SITE_NAME,
+            description: 'Colabore com as obras sociais, reformas e projetos da Paróquia Senhor Santo Cristo dos Milagres.',
+            image: DEFAULT_IMAGE,
+            url: baseUrl + '/campanhas',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
+      }
+
+      if (pathname === '/avisos') {
+        return new Response(
+          generateHTML({
+            title: 'Avisos & Comunicados Paroquiais | ' + SITE_NAME,
+            description: 'Confira os avisos, novenas, celebrações e comunicados oficiais da paróquia.',
+            image: DEFAULT_IMAGE,
+            url: baseUrl + '/avisos',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
+      }
+
+      if (pathname === '/programacoes') {
+        return new Response(
+          generateHTML({
+            title: 'Programações & Horários de Missas | ' + SITE_NAME,
+            description: 'Horários de missas, terço dos homens, grupo de oração e atividades paroquiais.',
+            image: DEFAULT_IMAGE,
+            url: baseUrl + '/programacoes',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
+      }
+
+      if (pathname === '/documentacoes') {
+        return new Response(
+          generateHTML({
+            title: 'Documentações & Sacramentos | ' + SITE_NAME,
+            description: 'Guias e orientações para Batismo, Casamento, Primeira Comunhão e Crisma.',
+            image: 'https://paroquiasantocristo.com.br/procedimentos.webp',
+            url: baseUrl + '/documentacoes',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
+      }
+
+      if (pathname === '/galeria-dos-padres') {
+        return new Response(
+          generateHTML({
+            title: 'Galeria dos Padres | ' + SITE_NAME,
+            description: 'Histórico dos sacerdotes e párocos que serviram com dedicação à nossa comunidade.',
+            image: DEFAULT_IMAGE,
+            url: baseUrl + '/galeria-dos-padres',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
+      }
+
+      // Default root fallback for social bots
+      if (pathname === '/' || pathname === '') {
+        return new Response(
+          generateHTML({
+            title: SITE_NAME + ' | Cidade Tiradentes - SP',
+            description: DEFAULT_DESCRIPTION,
+            image: DEFAULT_IMAGE,
+            url: baseUrl + '/',
+          }),
+          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        );
       }
     }
 
