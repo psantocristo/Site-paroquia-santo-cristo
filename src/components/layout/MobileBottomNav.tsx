@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Calendar, Users, Image as ImageIcon, Menu } from 'lucide-react';
+import { Home, Calendar, Bell, Image as ImageIcon, Menu } from 'lucide-react';
 
 interface MobileBottomNavProps {
   onNavigate: (section: string) => void;
@@ -9,7 +9,7 @@ interface MobileBottomNavProps {
 
 /**
  * Bottom navigation bar visível apenas em mobile (<lg).
- * 5 slots: Início, Programações, Eventos, Fotos, Menu.
+ * 5 slots: Início, Avisos, Programação, Fotos, Menu.
  */
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onNavigate,
@@ -18,54 +18,54 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 }) => {
   const items = [
     { id: 'home', label: 'Início', icon: Home },
+    { id: 'announcements', label: 'Avisos', icon: Bell },
     { id: 'programs', label: 'Programação', icon: Calendar },
-    { id: 'announcements', label: 'Eventos', icon: Users },
     { id: 'photos', label: 'Fotos', icon: ImageIcon },
   ] as const;
 
   return (
     <nav
       aria-label="Navegação inferior"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-red-950/98 to-red-900/95 backdrop-blur-md border-t border-gold-500/25 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] safe-area-inset-bottom"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#240404] border-t border-[#c5a059]/40 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] safe-area-inset-bottom"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 6px)' }}
     >
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-5 h-16 items-center">
         {items.map(({ id, label, icon: Icon }) => {
           const active = activeSection === id;
           return (
-            <li key={id}>
+            <li key={id} className="h-full">
               <button
                 onClick={() => onNavigate(id)}
-                className={`w-full flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] touch-manipulation transition-colors ${
+                className={`w-full h-full flex flex-col items-center justify-center gap-1 touch-manipulation transition-colors ${
                   active
-                    ? 'text-gold-300'
-                    : 'text-white/80 active:text-gold-200 hover:text-gold-200'
+                    ? 'text-[#e8c872] font-semibold'
+                    : 'text-stone-300 hover:text-[#e8c872] active:text-[#e8c872]'
                 }`}
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
               >
-                <Icon size={20} strokeWidth={1.75} />
-                <span className="text-[10px] font-medium tracking-wide font-sans">
+                <Icon size={20} strokeWidth={active ? 2.2 : 1.75} />
+                <span className="text-[10px] tracking-tight font-sans">
                   {label}
                 </span>
                 <span
-                  className={`h-0.5 w-6 rounded-full mt-0.5 transition-all ${
-                    active ? 'bg-gold-400' : 'bg-transparent'
+                  className={`h-0.5 w-5 rounded-full transition-all ${
+                    active ? 'bg-[#e8c872]' : 'bg-transparent'
                   }`}
                 />
               </button>
             </li>
           );
         })}
-        <li>
+        <li className="h-full">
           <button
             onClick={onOpenMenu}
-            className="w-full flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] text-white/80 hover:text-gold-200 active:text-gold-200 touch-manipulation transition-colors"
+            className="w-full h-full flex flex-col items-center justify-center gap-1 text-stone-300 hover:text-[#e8c872] active:text-[#e8c872] touch-manipulation transition-colors"
             aria-label="Abrir menu completo"
           >
             <Menu size={20} strokeWidth={1.75} />
-            <span className="text-[10px] font-medium tracking-wide font-sans">Menu</span>
-            <span className="h-0.5 w-6 rounded-full mt-0.5 bg-transparent" />
+            <span className="text-[10px] font-sans">Menu</span>
+            <span className="h-0.5 w-5 rounded-full bg-transparent" />
           </button>
         </li>
       </ul>
