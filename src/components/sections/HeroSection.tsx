@@ -9,110 +9,120 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   return (
-    <section className="relative flex items-center justify-center overflow-hidden py-16 sm:py-20 md:py-24">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-900 via-red-800 to-amber-800"></div>
+    <section className="relative flex items-center justify-center overflow-hidden py-16 sm:py-24 md:py-28">
+      {/* Liturgical Sacred Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#2a0606] via-[#481010] to-[#200404]"></div>
       
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-        backgroundSize: '32px 32px'
+      {/* Decorative Radial Gold Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-96 sm:h-[600px] bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      {/* Subtle sacred pattern overlay */}
+      <div className="absolute inset-0 opacity-[0.04]" style={{
+        backgroundImage: `radial-gradient(circle at 2px 2px, #f5ecd0 1px, transparent 0)`,
+        backgroundSize: '36px 36px'
       }}></div>
 
-      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
-        {/* Main Content */}
+      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        {/* Main Header Content */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
         >
-          {/* Icon */}
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/20 rounded-2xl mb-5 backdrop-blur-sm border border-amber-400/30">
-            <Church className="h-7 w-7 sm:h-8 sm:w-8 text-amber-400" />
+          {/* Emblem Icon */}
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gold-400/20 to-gold-600/10 rounded-2xl mb-6 backdrop-blur-md border border-gold-400/40 shadow-gold">
+            <Church className="h-8 w-8 sm:h-10 sm:w-10 text-gold-300 drop-shadow" />
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold-400/10 border border-gold-400/30 rounded-full text-gold-300 text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase font-sans mb-4 backdrop-blur-sm">
+            ✦ Diocese de São Miguel Paulista ✦
           </div>
           
-          {/* Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
+          {/* Main Title */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-3 tracking-tight leading-tight">
             Paróquia Senhor Santo Cristo
-            <span className="block text-amber-300 text-lg sm:text-xl md:text-2xl font-medium mt-1">
+            <span className="block text-gold-300 font-serif italic text-2xl sm:text-3xl md:text-4xl font-normal mt-1">
               dos Milagres
             </span>
           </h1>
           
           {/* Location badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full text-amber-100 text-sm mb-6 backdrop-blur-sm">
-            <MapPin className="h-3.5 w-3.5" />
-            <span>Cid. Tiradentes, São Paulo</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/30 border border-white/10 rounded-full text-stone-300 text-xs sm:text-sm mb-8 backdrop-blur-md">
+            <MapPin className="h-3.5 w-3.5 text-gold-400" />
+            <span>Cidade Tiradentes • São Paulo, SP</span>
           </div>
         </motion.div>
 
-        {/* Celebration Card - Compact */}
+        {/* 40 Years Celebration Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/10 backdrop-blur-md rounded-xl p-5 sm:p-6 mb-6 border border-white/15"
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="glass-wine rounded-3xl p-6 sm:p-8 mb-8 border border-gold-400/30 shadow-2xl relative overflow-hidden"
         >
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="h-px w-8 bg-amber-400/50" />
-            <span className="text-amber-400 text-sm font-medium">Celebração Especial</span>
-            <div className="h-px w-8 bg-amber-400/50" />
+          {/* Hairline top decoration */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
+
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-400" />
+            <span className="text-gold-300 text-xs sm:text-sm font-sans font-semibold uppercase tracking-[0.2em]">Jubileu Paroquial</span>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold-400" />
           </div>
           
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3">
-            40 Anos de Fé e Comunhão
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white mb-3 tracking-tight">
+            40 Anos de Fé, Esperança e Comunhão
           </h2>
           
-          <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-xl mx-auto mb-5">
-            Celebrando quatro décadas de fé, esperança e amor. Uma jornada de milagres, bênçãos e união em Cristo.
+          <p className="text-stone-200 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-6 font-light">
+            Quatro décadas dedicadas à evangelização, ao acolhimento fraterno e ao testemunho do amor de Cristo em nossa comunidade.
           </p>
           
-          {/* Info badges inline */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-white/90 text-xs sm:text-sm">
-              <Calendar className="h-3.5 w-3.5 text-amber-400" />
-              Fundada em 1985
+          {/* Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/40 border border-gold-400/20 rounded-full text-gold-200 text-xs sm:text-sm font-medium">
+              <Calendar className="h-4 w-4 text-gold-400" />
+              Fundação: 1985
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-white/90 text-xs sm:text-sm">
-              <Church className="h-3.5 w-3.5 text-amber-400" />
-              40 anos de história
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/40 border border-gold-400/20 rounded-full text-gold-200 text-xs sm:text-sm font-medium">
+              <Church className="h-4 w-4 text-gold-400" />
+              1985 - 2025 • 40 Anos
             </span>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2.5 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
             <Button
               variant="secondary"
               size="md"
               onClick={() => onNavigate('history')}
-              className="text-sm"
+              className="w-full sm:w-auto"
             >
               Conheça Nossa História
             </Button>
             <Button
-              variant="outline"
+              variant="outline-gold"
               size="md"
-              onClick={() => onNavigate('photos')}
-              className="text-sm"
+              onClick={() => onNavigate('programs')}
+              className="w-full sm:w-auto text-white bg-black/40 border-gold-400/50 hover:bg-gold-400/20"
             >
-              Ver Fotos
+              Horários de Missa
             </Button>
           </div>
         </motion.div>
 
-        {/* Quote - Minimal */}
+        {/* Sacred Quote */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-white/60 text-xs sm:text-sm italic"
+          className="text-stone-300/80 text-xs sm:text-sm italic font-serif"
         >
-          "Onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles" 
-          <span className="text-amber-300/80 not-italic ml-1">— Mt 18,20</span>
+          "Onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles."
+          <span className="text-gold-400 not-italic ml-1 font-sans font-semibold text-xs">— Mt 18, 20</span>
         </motion.p>
       </div>
 
-      {/* Scroll indicator - Smaller */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -122,12 +132,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-5 h-8 border-2 border-white/30 rounded-full flex justify-center"
+          className="w-5 h-8 border-2 border-gold-400/30 rounded-full flex justify-center"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-2 bg-white/50 rounded-full mt-1.5"
+            className="w-1 h-2 bg-gold-400/60 rounded-full mt-1.5"
           />
         </motion.div>
       </motion.div>

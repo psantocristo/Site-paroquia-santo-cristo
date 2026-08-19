@@ -207,6 +207,68 @@
     height: 100vh;
     height: 100dvh;
   }
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1ece4;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c5a059;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8823b;
+  }
+}
+
+/* Institutional and liturgical styling */
+.glass-wine {
+  background: linear-gradient(135deg, rgba(60, 13, 13, 0.95), rgba(97, 26, 26, 0.92));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(228, 220, 201, 0.8);
+  box-shadow: 0 4px 24px -6px rgba(60, 13, 13, 0.08);
+}
+
+.glass-card:hover {
+  border-color: rgba(181, 143, 52, 0.45);
+  box-shadow: 0 12px 32px -8px rgba(60, 13, 13, 0.15);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #e8c872 0%, #c9a84c 50%, #8f6d25 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-glow {
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.15);
+}
+
+.sacred-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.sacred-divider::before,
+.sacred-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  max-width: 80px;
+  background: linear-gradient(90deg, transparent, rgba(181, 143, 52, 0.6), transparent);
 }
 
 /* Rich text editor styles */
@@ -215,6 +277,8 @@
   border-left: 1px solid #d1d5db !important;
   border-right: 1px solid #d1d5db !important;
   border-bottom: none !important;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 .ql-container {
@@ -222,28 +286,28 @@
   border-left: 1px solid #d1d5db !important;
   border-right: 1px solid #d1d5db !important;
   border-top: none !important;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 .ql-editor {
   font-family: inherit;
   line-height: 1.6;
+  min-height: 150px;
 }
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
-  /* Reduce motion on mobile for better performance */
   .motion-reduce {
     animation: none !important;
     transition: none !important;
   }
 
-  /* Better touch targets */
   button, a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Prevent zoom on input focus */
   input, select, textarea {
     font-size: 16px;
   }

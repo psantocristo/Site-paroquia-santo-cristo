@@ -100,21 +100,24 @@ export function AnnouncementsSection() {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8 md:mb-14"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10 md:mb-14"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-full text-sm font-medium mb-4">
-            <Megaphone className="h-4 w-4" />
-            Comunicados
-          </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-900/10 border border-gold-400/30 rounded-full text-red-900 text-xs sm:text-sm font-semibold tracking-wider uppercase font-sans mb-3">
+            <Megaphone className="h-3.5 w-3.5 text-gold-600" />
+            Comunicados & Agenda
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-red-950 mb-3 tracking-tight">
             Avisos Paroquiais
           </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
-            Fique por dentro dos eventos e comunicados da nossa comunidade
+          <div className="sacred-divider max-w-xs mx-auto my-2">
+            <span className="text-gold-500 text-xs">✦</span>
+          </div>
+          <p className="text-stone-600 max-w-2xl mx-auto text-sm md:text-base font-light">
+            Fique por dentro das celebrações, formações, eventos e comunicados oficiais da nossa comunidade.
           </p>
         </motion.div>
 
