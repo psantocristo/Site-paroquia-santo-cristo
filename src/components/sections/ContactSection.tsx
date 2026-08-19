@@ -113,14 +113,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onNavigateToProg
   }
 
   return (
-    <section id="contact" className="py-12 bg-gradient-to-b from-white to-gray-50">
+    <section id="contact" className="py-8 md:py-12 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8 md:mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-800 to-amber-600 bg-clip-text text-transparent mb-4">
             Contato

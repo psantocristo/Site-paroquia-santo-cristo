@@ -70,7 +70,7 @@ export const VideosCarouselSection: React.FC<VideosCarouselSectionProps> = ({ on
   }
 
   return (
-    <section id="videos-carousel" className="py-12 bg-gradient-to-br from-red-50 via-white to-amber-50 overflow-hidden">
+    <section id="videos-carousel" className="py-8 md:py-10 bg-gradient-to-br from-red-50 via-white to-amber-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <motion.div

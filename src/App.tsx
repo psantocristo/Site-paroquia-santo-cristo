@@ -86,13 +86,14 @@ function App() {
   // Valores padrão para evitar layout shift enquanto carrega do Supabase
   const [homeSections, setHomeSections] = useState<{[key: string]: boolean}>({
     hero: true,
-    history: true,
+    jubileu_40anos: false,
+    history: false,
     priest: true,
     announcements: true,
-    blog: true,
+    blog: false,
     albums: true,
     videos_carousel: true,
-    priests_carousel: true,
+    priests_carousel: false,
     programs: true,
     contact: true
   });
@@ -1176,7 +1177,7 @@ function App() {
           <Header onNavigate={handleNavigate} />
           <main>
             {homeSections['hero'] && <SlidesSection />}
-            {homeSections['hero'] && <HeroSection onNavigate={handleNavigate} />}
+            {homeSections['jubileu_40anos'] && <HeroSection onNavigate={handleNavigate} />}
             {homeSections['history'] && <HistorySection />}
             {homeSections['priest'] && <PriestSection />}
             {homeSections['programs'] && <ProgramsSection />}

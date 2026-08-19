@@ -96,7 +96,7 @@ export function AnnouncementsSection() {
   }
 
   return (
-    <section id="announcements" className="py-12 md:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50">
+    <section id="announcements" className="py-8 md:py-12 bg-gradient-to-b from-gray-50 via-white to-gray-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div

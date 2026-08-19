@@ -72,7 +72,7 @@ export const ProgramsSection: React.FC = () => {
   if (programs.length === 0) return null;
 
   return (
-    <section id="programs" className="py-20 md:py-28 bg-white overflow-hidden">
+    <section id="programs" className="py-8 md:py-12 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header — editorial style */}
         <motion.div

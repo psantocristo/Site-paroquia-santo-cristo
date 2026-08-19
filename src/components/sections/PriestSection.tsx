@@ -80,7 +80,7 @@ export const PriestSection: React.FC = () => {
   const otherPriests = priests.slice(1);
 
   return (
-    <section id="priest" className="py-20 md:py-28 bg-cream-50 overflow-hidden">
+    <section id="priest" className="py-8 md:py-12 bg-cream-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div

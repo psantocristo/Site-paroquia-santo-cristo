@@ -36,16 +36,22 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     }
   };
 
-  const menuItems = [
+  const desktopMenuItems = [
     { id: 'home', label: 'Início' },
-    { id: 'history', label: 'História' },
+    { id: 'announcements', label: 'Avisos' },
+    { id: 'programs', label: 'Programações' }
+  ];
+
+  const allMenuItems = [
+    { id: 'home', label: 'Início' },
     { id: 'announcements', label: 'Avisos' },
     { id: 'programs', label: 'Programações' },
-    { id: 'pastorals', label: 'Pastorais' },
-    { id: 'documentacoes', label: 'Documentações' },
-    { id: 'eventos-informativos', label: 'Vídeos' },
-    { id: 'photos', label: 'Fotos' },
-    { id: 'contact', label: 'Contato' }
+    { id: 'history', label: 'Nossa História' },
+    { id: 'pastorals', label: 'Pastorais & Movimentos' },
+    { id: 'documentacoes', label: 'Documentações & Sacramentos' },
+    { id: 'eventos-informativos', label: 'Vídeos & Informativos' },
+    { id: 'photos', label: 'Galeria de Fotos' },
+    { id: 'contact', label: 'Fale Conosco' }
   ];
 
   const handleNavigate = (section: string) => {
@@ -115,29 +121,29 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     Paróquia Senhor Santo Cristo
                   </h1>
                   <p className="text-[#e8c872]/90 text-[10px] sm:text-xs tracking-[0.25em] uppercase font-sans font-medium">
-                    40 Anos de Fé • 1985 - 2025
+                    Diocese de São Miguel Paulista
                   </p>
                 </div>
               </>
             )}
           </motion.div>
 
-          {/* Desktop Navigation Links (Visible on lg+ screens) */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            {menuItems.map((item) => (
+          {/* Desktop Navigation Links (Início, Avisos, Programações) */}
+          <nav className="hidden md:flex items-center gap-2 lg:gap-4">
+            {desktopMenuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="px-3 py-2 text-sm text-stone-100 hover:text-[#e8c872] font-semibold tracking-wide transition-all duration-150 rounded-lg hover:bg-white/10 relative group cursor-pointer"
+                className="px-3.5 py-2 text-sm text-stone-100 hover:text-[#e8c872] font-semibold tracking-wide transition-all duration-150 rounded-lg hover:bg-white/10 relative group cursor-pointer"
               >
                 {item.label}
-                <span className="absolute bottom-1 left-3 right-3 h-0.5 bg-[#e8c872] scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center rounded-full" />
+                <span className="absolute bottom-1 left-3.5 right-3.5 h-0.5 bg-[#e8c872] scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center rounded-full" />
               </button>
             ))}
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Search Button */}
             <motion.button
               whileHover={{ scale: 1.08 }}
@@ -153,40 +159,41 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               <Search size={20} />
             </motion.button>
 
-            {/* Direct Oferta CTA (Desktop) */}
+            {/* Direct Oferta CTA */}
             <button
               onClick={() => {
                 window.location.pathname = '/campanhas';
               }}
-              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-b from-[#e8c872] via-[#c9a84c] to-[#b58f34] hover:from-[#f3db92] hover:to-[#c9a84c] text-[#240404] font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#f5ecd0]/60 active:scale-95"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-b from-[#e8c872] via-[#c9a84c] to-[#b58f34] hover:from-[#f3db92] hover:to-[#c9a84c] text-[#240404] font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#f5ecd0]/60 active:scale-95"
             >
               <Heart className="h-4 w-4 fill-[#240404]" />
               <span>Oferta</span>
             </button>
 
-            {/* Mobile Hamburger Menu Button (Hidden on lg+) */}
+            {/* Hamburger Menu Button (Available for desktop and mobile to access all other pages) */}
             <button
-              className="lg:hidden text-white hover:text-[#e8c872] p-2 rounded-lg hover:bg-white/10 cursor-pointer"
+              className="text-white hover:text-[#e8c872] p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-[#c5a059]/40 transition-all cursor-pointer flex items-center justify-center"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               style={{ touchAction: 'manipulation' }}
-              aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu com todas as páginas'}
+              title="Menu completo"
             >
-              {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Dropdown Drawer */}
+        {/* Dropdown Menu (Full list of sections) */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.nav
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full overflow-hidden"
+              className="py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full overflow-hidden shadow-2xl"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 px-2">
-                {menuItems.map((item) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 px-2">
+                {allMenuItems.map((item) => (
                   <motion.div
                     key={item.id}
                     className="w-full"
@@ -206,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                   </motion.div>
                 ))}
               </div>
-              <div className="p-3 mt-2 border-t border-white/10 sm:hidden">
+              <div className="p-3 mt-2 border-t border-white/10">
                 <button
                   onClick={() => {
                     window.location.pathname = '/campanhas';
@@ -214,7 +221,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                   className="w-full py-3 bg-gradient-to-r from-[#e8c872] to-[#c9a84c] text-[#240404] font-bold text-center rounded-xl shadow-md text-sm flex items-center justify-center gap-2"
                 >
                   <Heart className="h-4 w-4 fill-[#240404]" />
-                  <span>Fazer uma Oferta / Dízimo</span>
+                  <span>Fazer uma Oferta / Dízimo Paroquial</span>
                 </button>
               </div>
             </motion.nav>

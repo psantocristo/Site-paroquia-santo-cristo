@@ -123,7 +123,7 @@ Hoje, olhamos para o futuro com esperança, gratos por tudo que o Senhor nos con
   }
 
   return (
-    <section id="history" className="py-20 md:py-28 bg-cream-50 overflow-hidden">
+    <section id="history" className="py-8 md:py-12 bg-cream-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div

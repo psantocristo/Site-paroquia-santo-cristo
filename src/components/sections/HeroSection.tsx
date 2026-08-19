@@ -9,7 +9,7 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   return (
-    <section className="relative flex items-center justify-center overflow-hidden py-16 sm:py-24 md:py-28">
+    <section className="relative flex items-center justify-center overflow-hidden py-8 sm:py-12 md:py-14">
       {/* Liturgical Sacred Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#2a0606] via-[#481010] to-[#200404]"></div>
       
