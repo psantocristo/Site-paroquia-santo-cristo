@@ -320,3 +320,18 @@
     image-rendering: crisp-edges;
   }
 }
+
+/* Form Input Readability and High Contrast */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea,
+select {
+  color: #1c1917 !important;
+  -webkit-text-fill-color: #1c1917 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #78716c !important;
+  -webkit-text-fill-color: #78716c !important;
+  opacity: 0.8 !important;
+}

@@ -81,10 +81,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           <div className="flex items-center justify-center gap-4 text-xs text-stone-400">
             <button
-              onClick={() => {
-                window.location.pathname = '/login';
-              }}
-              className="inline-flex items-center gap-1.5 hover:text-[#e8c872] transition-colors py-1 px-3 rounded-lg bg-white/5 border border-white/10"
+              onClick={() => onNavigate('admin')}
+              className="inline-flex items-center gap-1.5 hover:text-[#e8c872] transition-colors py-1.5 px-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer"
             >
               <Lock className="h-3 w-3" />
               <span>Acesso Administrativo</span>
@@ -190,10 +188,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </button>
             <div className="pt-2">
               <button
-                onClick={() => {
-                  window.location.pathname = '/login';
-                }}
-                className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-[#e8c872] transition-colors"
+                onClick={() => onNavigate('admin')}
+                className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-[#e8c872] transition-colors cursor-pointer"
                 title="Área Administrativa"
               >
                 <Lock className="h-3 w-3" />

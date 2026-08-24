@@ -472,6 +472,7 @@ function App() {
               setIsAuthenticated(true);
               navigateTo('/admin');
             }}
+            onBack={() => navigateTo('home')}
           />
         );
 
@@ -483,6 +484,7 @@ function App() {
                 setIsAuthenticated(true);
                 navigateTo('/admin');
               }}
+              onBack={() => navigateTo('home')}
             />
           );
         }
@@ -495,7 +497,7 @@ function App() {
   };
 
   // Full-screen standalone routes without regular Header/Footer wrapper
-  const isFullScreen = route.type === 'admin' && isAuthenticated;
+  const isFullScreen = route.type === 'admin' || route.type === 'login';
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between">

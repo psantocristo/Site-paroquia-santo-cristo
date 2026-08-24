@@ -221,41 +221,44 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
   return (
     <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* Header fixo */}
-      <header className="bg-gradient-to-r from-red-800 to-red-900 text-white shadow-lg z-50 sticky top-0">
+      <header className="bg-[#240404] text-white border-b border-[#c5a059]/40 shadow-lg z-50 sticky top-0">
         <div className="px-3 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-4">
               {/* Botão hambúrguer mobile */}
               <button
                 onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-white/20"
+                className="lg:hidden p-2 rounded-lg hover:bg-white/10 text-[#e8c872] cursor-pointer"
+                aria-label="Abrir menu lateral"
               >
                 <Menu className="h-5 w-5" />
               </button>
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-stone-300 hover:text-[#e8c872] transition-colors cursor-pointer py-1 px-2.5 rounded-lg hover:bg-white/5"
               >
-                <ArrowLeft className="h-5 w-5" />
-                <span className="hidden sm:inline">Voltar ao Site</span>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline text-xs font-semibold">Voltar ao Site</span>
               </button>
-              <div className="h-6 w-px bg-white/30 hidden sm:block" />
+              <div className="h-6 w-px bg-white/20 hidden sm:block" />
               <div className="flex items-center gap-2">
-                <Home className="h-5 w-5 hidden sm:block" />
-                <h1 className="text-base sm:text-xl font-bold truncate max-w-[150px] sm:max-w-none">Painel Admin</h1>
+                <Home className="h-4 w-4 text-[#c5a059] hidden sm:block" />
+                <h1 className="text-base sm:text-lg font-serif font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
+                  Painel Administrativo
+                </h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-red-200 hidden md:inline">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-[#e8c872] hidden md:inline px-3 py-1 bg-white/5 rounded-full border border-[#c5a059]/30">
                 {getTabLabel(activeTab)}
               </span>
               <Button 
                 variant="outline" 
                 onClick={handleSignOut}
-                className="border-white/30 text-white hover:bg-white/20 px-2 sm:px-4"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-[#e8c872] px-3 py-1 text-xs"
               >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline ml-2">Sair</span>
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline ml-1.5">Sair</span>
               </Button>
             </div>
           </div>
@@ -299,18 +302,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                   {/* Group Header */}
                   <button
                     onClick={() => toggleGroup(group.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 font-medium ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150 font-medium cursor-pointer ${
                       expandedGroups.includes(group.id)
-                        ? 'bg-red-50 text-red-800'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#240404]/5 text-[#240404] font-bold'
+                        : 'text-stone-700 hover:bg-stone-100'
                     }`}
                   >
-                    <group.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="flex-1 text-sm">{group.label}</span>
+                    <group.icon className="h-4 w-4 text-[#c5a059] flex-shrink-0" />
+                    <span className="flex-1 text-xs sm:text-sm">{group.label}</span>
                     {expandedGroups.includes(group.id) ? (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-3.5 w-3.5 text-stone-400" />
                     ) : (
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-3.5 w-3.5 text-stone-400" />
                     )}
                   </button>
 
@@ -324,18 +327,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-gray-200 pl-3">
+                        <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-[#c5a059]/30 pl-2.5">
                           {group.tabs.map((tab) => (
                             <button
                               key={tab.id}
                               onClick={() => handleTabClick(tab.id, group.id)}
-                              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all duration-200 text-sm ${
+                              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all duration-150 text-xs sm:text-sm cursor-pointer ${
                                 activeTab === tab.id
-                                  ? 'bg-red-800 text-white shadow-md'
-                                  : 'text-gray-600 hover:bg-gray-100 hover:text-red-800'
+                                  ? 'bg-[#240404] text-[#e8c872] shadow-sm font-bold'
+                                  : 'text-stone-600 hover:bg-stone-100 hover:text-[#240404]'
                               }`}
                             >
-                              <tab.icon className="h-4 w-4 flex-shrink-0" />
+                              <tab.icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === tab.id ? 'text-[#e8c872]' : 'text-stone-400'}`} />
                               <span className="truncate">{tab.label}</span>
                             </button>
                           ))}
