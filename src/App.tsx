@@ -23,6 +23,7 @@ const PriestSection = React.lazy(() => import('./components/sections/PriestSecti
 const ProgramsSection = React.lazy(() => import('./components/sections/ProgramsSection').then(m => ({ default: m.ProgramsSection })));
 const PriestsCarouselSection = React.lazy(() => import('./components/sections/PriestsCarouselSection').then(m => ({ default: m.PriestsCarouselSection })));
 const VideosCarouselSection = React.lazy(() => import('./components/sections/VideosCarouselSection').then(m => ({ default: m.VideosCarouselSection })));
+const MassScheduleSection = React.lazy(() => import('./components/sections/MassScheduleSection').then(m => ({ default: m.MassScheduleSection })));
 
 // Lazy load all subpage components
 const CelebrationsPage = React.lazy(() => import('./components/sections/CelebrationsPage').then(m => ({ default: m.CelebrationsPage })));
@@ -315,8 +316,8 @@ function App() {
       return;
     }
 
-    // Home Section scroll (e.g. 'history', 'programs', 'announcements', 'pastorals', 'photos', 'contact')
-    const validSections = ['history', 'programs', 'announcements', 'pastorals', 'photos', 'contact', 'priest'];
+    // Home Section scroll (e.g. 'history', 'programs', 'announcements', 'pastorals', 'photos', 'contact', 'priest', 'horarios-missas')
+    const validSections = ['history', 'programs', 'announcements', 'pastorals', 'photos', 'contact', 'priest', 'horarios-missas'];
     if (validSections.includes(target)) {
       if (route.type !== 'home') {
         window.history.pushState(null, '', '/#' + target);
@@ -347,10 +348,11 @@ function App() {
           <main>
             {homeSections['hero'] && <SlidesSection />}
             {homeSections['jubileu_40anos'] && <HeroSection onNavigate={navigateTo} />}
-            {homeSections['history'] && <HistorySection />}
-            {homeSections['priest'] && <PriestSection />}
-            {homeSections['programs'] && <ProgramsSection />}
+            <MassScheduleSection />
             {homeSections['announcements'] && <AnnouncementsSection />}
+            {homeSections['programs'] && <ProgramsSection />}
+            {homeSections['priest'] && <PriestSection />}
+            {homeSections['history'] && <HistorySection />}
             {homeSections['blog'] && <BlogSection />}
             {homeSections['albums'] && (
               <PhotoGallery onNavigateToFullGallery={() => navigateTo('/albuns')} />
