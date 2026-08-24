@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { supabase, Slide } from '../../lib/supabase';
 
 export const SlidesSection: React.FC = () => {
@@ -9,18 +8,8 @@ export const SlidesSection: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState<{ [key: number]: boolean }>({});
-  const [isMobile, setIsMobile] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [transitionTime, setTransitionTime] = useState(8000);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   useEffect(() => {
     fetchSlides();
@@ -118,6 +107,22 @@ export const SlidesSection: React.FC = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 45) {
+      nextSlide();
+    } else if (diff < -45) {
+      prevSlide();
+    }
+    setTouchStartX(null);
+  };
+
   const handleButtonClick = (slide: Slide) => {
     if (!slide.button_link) return;
 
@@ -146,7 +151,11 @@ export const SlidesSection: React.FC = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full overflow-hidden group mt-16 sm:mt-20 aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] max-h-[620px] bg-stone-950">
+    <section
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full overflow-hidden group mt-16 sm:mt-20 aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] max-h-[620px] bg-stone-950 select-none"
+    >
       {/* Slides with smooth transition */}
       <AnimatePresence mode="wait">
         {slides.map((slide, index) => {
@@ -173,7 +182,7 @@ export const SlidesSection: React.FC = () => {
               />
 
               {/* Gradient Overlays for perfect legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/25" />
               <div className="absolute inset-0 bg-gradient-to-r from-[#200303]/70 via-transparent to-transparent hidden md:block" />
 
               {/* Slide Content */}
@@ -181,10 +190,10 @@ export const SlidesSection: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="space-y-2.5 sm:space-y-3.5"
+                  transition={{ delay: 0.15, duration: 0.45 }}
+                  className="space-y-2 sm:space-y-3.5"
                 >
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#240404]/80 backdrop-blur-md border border-[#c5a059]/40 text-[#e8c872] text-[11px] font-bold tracking-widest uppercase">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 sm:py-1 rounded-full bg-[#240404]/80 backdrop-blur-md border border-[#c5a059]/40 text-[#e8c872] text-[10px] sm:text-[11px] font-bold tracking-widest uppercase">
                     <span>✦ Destaque</span>
                   </div>
 
@@ -199,10 +208,10 @@ export const SlidesSection: React.FC = () => {
                   )}
 
                   {slide.button_text && slide.button_link && (
-                    <div className="pt-2">
+                    <div className="pt-1.5 sm:pt-2">
                       <button
                         onClick={() => handleButtonClick(slide)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-b from-[#e8c872] to-[#c9a84c] text-[#240404] font-bold text-xs sm:text-sm rounded-xl shadow-lg hover:from-[#f3db92] hover:to-[#c9a84c] transition-all cursor-pointer border border-[#f5ecd0]/60 active:scale-95"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-b from-[#e8c872] to-[#c9a84c] text-[#240404] font-bold text-xs sm:text-sm rounded-xl shadow-lg hover:from-[#f3db92] hover:to-[#c9a84c] transition-all cursor-pointer border border-[#f5ecd0]/60 active:scale-95 touch-manipulation"
                       >
                         <span>{slide.button_text}</span>
                         {slide.button_link_type === 'external' ? (
@@ -225,7 +234,7 @@ export const SlidesSection: React.FC = () => {
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-[#240404]/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 border border-white/20 hover:border-[#c5a059] backdrop-blur-sm cursor-pointer z-20"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-[#240404]/90 text-white hidden sm:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 border border-white/20 hover:border-[#c5a059] backdrop-blur-sm cursor-pointer z-20"
             aria-label="Slide anterior"
           >
             <ChevronLeft size={22} />
@@ -233,27 +242,11 @@ export const SlidesSection: React.FC = () => {
 
           <button
             onClick={nextSlide}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-[#240404]/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 border border-white/20 hover:border-[#c5a059] backdrop-blur-sm cursor-pointer z-20"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-[#240404]/90 text-white hidden sm:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 border border-white/20 hover:border-[#c5a059] backdrop-blur-sm cursor-pointer z-20"
             aria-label="Próximo slide"
           >
             <ChevronRight size={22} />
           </button>
-
-          {/* Dots Indicator */}
-          <div className="absolute bottom-3 sm:bottom-5 right-5 sm:right-8 flex items-center gap-1.5 z-20">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  idx === currentSlide
-                    ? 'w-6 bg-[#e8c872]'
-                    : 'w-2 bg-white/40 hover:bg-white/70'
-                }`}
-                aria-label={`Ir para slide ${idx + 1}`}
-              />
-            ))}
-          </div>
         </>
       )}
     </section>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Church, Search, Heart } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { MobileBottomNav } from './MobileBottomNav';
 
 interface HeaderProps {
   onNavigate: (section: string) => void;
@@ -95,7 +94,6 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   };
 
   return (
-    <>
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#240404] border-b border-[#c5a059]/40 shadow-2xl safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 w-full">
@@ -229,10 +227,5 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         </AnimatePresence>
       </div>
     </header>
-    <MobileBottomNav
-      onNavigate={(id) => handleNavigate(id)}
-      onOpenMenu={() => setIsMenuOpen(true)}
-    />
-    </>
   );
 };
