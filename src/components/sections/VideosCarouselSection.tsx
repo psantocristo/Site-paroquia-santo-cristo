@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Play, ChevronRight, Video } from 'lucide-react';
+import { Play, ChevronRight, ChevronLeft, Video, Sparkles, ExternalLink } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -36,16 +36,21 @@ export const VideosCarouselSection: React.FC<VideosCarouselSectionProps> = ({ on
         .select('*')
         .eq('is_active', true)
         .order('order_index', { ascending: true })
-        .limit(6);
+        .limit(8);
 
       if (error) throw error;
-      // @ts-expect-error - Supabase returns string for enum, interface expects literal type
       setVideos(data || []);
     } catch (error) {
       console.error('Error fetching videos:', error);
-      toast.error('Erro ao carregar vídeos');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const offset = direction === 'left' ? -320 : 320;
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
     }
   };
 
@@ -55,170 +60,132 @@ export const VideosCarouselSection: React.FC<VideosCarouselSectionProps> = ({ on
 
   if (loading) {
     return (
-      <section className="py-12 bg-gradient-to-br from-red-50 via-white to-amber-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-800"></div>
-          </div>
+      <section className="py-10 bg-white">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#240404] mx-auto" />
         </div>
       </section>
     );
   }
 
-  if (videos.length === 0) {
-    return null;
-  }
+  if (videos.length === 0) return null;
 
   return (
-    <section id="videos-carousel" className="py-8 md:py-10 bg-gradient-to-br from-red-50 via-white to-amber-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8"
-        >
-          <div className="inline-flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-full mb-4">
-            <Video size={18} />
-            <span className="text-sm font-semibold uppercase tracking-wide">Multimídia</span>
+    <section id="videos-carousel" className="py-10 md:py-16 bg-[#faf7f2] border-t border-stone-200/60 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 md:mb-12">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-wider mb-2.5">
+              <Video className="h-3.5 w-3.5 text-[#c5a059]" />
+              <span>Multimídia & Evangelização</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight">
+              Eventos & Vídeos
+            </h2>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Eventos e Informativos
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Acompanhe os vídeos de eventos, celebrações e informações importantes da nossa comunidade
-          </p>
-        </motion.div>
 
-        {/* Carousel Container */}
-        <div className="relative">
-          {/* Gradient Overlay Left */}
-          <div className="hidden md:block absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-red-50 to-transparent z-10 pointer-events-none" />
-          
-          {/* Gradient Overlay Right */}
-          <div className="hidden md:block absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-amber-50 to-transparent z-10 pointer-events-none" />
+          <div className="flex items-center gap-3">
+            {/* Scroll navigation buttons for desktop */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                onClick={() => scroll('left')}
+                className="w-9 h-9 rounded-full border border-stone-300 hover:border-[#c5a059] bg-white hover:bg-[#240404] text-stone-700 hover:text-[#e8c872] flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                aria-label="Rolar para esquerda"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                className="w-9 h-9 rounded-full border border-stone-300 hover:border-[#c5a059] bg-white hover:bg-[#240404] text-stone-700 hover:text-[#e8c872] flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                aria-label="Rolar para direita"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
 
-          {/* Scrollable Container */}
-          <div
-            ref={scrollRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {videos.map((video, index) => (
+            <button
+              onClick={onNavigateToVideosPage}
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#240404] hover:text-[#931515] transition-colors group cursor-pointer ml-2"
+            >
+              <span>Ver todos os vídeos</span>
+              <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+
+        {/* Carousel Row */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {videos.map((video, index) => {
+            const thumbnail = video.thumbnail_url || (video.youtube_id ? getYouTubeThumbnail(video.youtube_id) : null);
+
+            return (
               <motion.div
                 key={video.id}
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-72 md:w-80 snap-start"
+                transition={{ delay: index * 0.05, duration: 0.35 }}
+                className="flex-shrink-0 w-72 sm:w-80 snap-start"
               >
                 <div
                   onClick={onNavigateToVideosPage}
-                  className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                  className="group bg-white rounded-2xl overflow-hidden border border-stone-200/80 hover:border-[#c5a059] shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full cursor-pointer"
                 >
-                  {/* Thumbnail */}
-                  <div className="relative aspect-video overflow-hidden">
-                    {video.thumbnail_url || (video.video_type === 'youtube' && video.youtube_id) ? (
+                  {/* Thumbnail & Play Overlay */}
+                  <div className="relative aspect-video overflow-hidden bg-stone-900">
+                    {thumbnail ? (
                       <img
-                        src={video.thumbnail_url || getYouTubeThumbnail(video.youtube_id!)}
+                        src={thumbnail}
                         alt={video.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-red-800 to-red-900 flex items-center justify-center">
-                        <Video className="text-white/50" size={48} />
+                      <div className="w-full h-full bg-gradient-to-br from-[#240404] to-[#1c0303] flex items-center justify-center">
+                        <Video className="text-[#e8c872]/40 h-12 w-12" />
                       </div>
                     )}
-                    
-                    {/* Play Button Overlay */}
-                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300 flex items-center justify-center">
-                      <div className="w-14 h-14 bg-white/90 group-hover:bg-white group-hover:scale-110 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
-                        <Play size={24} className="text-red-800 ml-1" fill="currentColor" />
+
+                    <div className="absolute inset-0 bg-black/35 group-hover:bg-black/50 transition-colors duration-300 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-[#240404]/90 group-hover:bg-[#e8c872] text-[#e8c872] group-hover:text-[#240404] flex items-center justify-center transition-all duration-300 shadow-xl border border-[#c5a059]/60 group-hover:scale-110">
+                        <Play size={20} className="ml-0.5" fill="currentColor" />
                       </div>
                     </div>
 
-                    {/* Badge */}
-                    <div className="absolute top-3 left-3 bg-red-800 text-white px-2 py-1 rounded-full text-xs font-bold">
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-stone-200 text-[10px] font-bold uppercase tracking-wider border border-white/10">
                       {video.video_type === 'youtube' ? 'YouTube' : 'Vídeo'}
-                    </div>
+                    </span>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-4">
-                    <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-red-800 transition-colors">
-                      {video.name}
-                    </h3>
-                    {video.description && (
-                      <p className="text-gray-600 text-sm line-clamp-2">
-                        {video.description}
-                      </p>
-                    )}
+                  {/* Text Content */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-serif font-bold text-base sm:text-lg text-[#240404] group-hover:text-[#931515] transition-colors line-clamp-2 leading-snug mb-1.5">
+                        {video.name}
+                      </h3>
+                      {video.description && (
+                        <p className="text-stone-600 text-xs line-clamp-2 font-light leading-relaxed">
+                          {video.description}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t border-stone-100 flex items-center justify-between text-xs font-semibold text-[#240404]">
+                      <span className="group-hover:text-[#931515] transition-colors">Assistir gravação</span>
+                      <ChevronRight className="h-4 w-4 text-[#c5a059] group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               </motion.div>
-            ))}
-
-            {/* Ver Todos Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: videos.length * 0.1, duration: 0.5 }}
-              className="flex-shrink-0 w-72 md:w-80 snap-start"
-            >
-              <div
-                onClick={onNavigateToVideosPage}
-                className="group cursor-pointer h-full bg-gradient-to-br from-red-800 to-red-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center justify-center min-h-[280px] p-6"
-              >
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <ChevronRight size={40} className="text-white" />
-                </div>
-                <h3 className="text-white font-bold text-xl mb-2 text-center">
-                  Ver Todos os Vídeos
-                </h3>
-                <p className="text-white/80 text-sm text-center">
-                  Acesse a galeria completa de eventos e informativos
-                </p>
-              </div>
-            </motion.div>
-          </div>
+            );
+          })}
         </div>
-
-        {/* Mobile Scroll Hint */}
-        <div className="flex md:hidden justify-center mt-4">
-          <div className="flex items-center gap-2 text-gray-500 text-sm">
-            <span>Deslize para ver mais</span>
-            <ChevronRight size={16} />
-          </div>
-        </div>
-
-        {/* Desktop CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="hidden md:flex justify-center mt-8"
-        >
-          <button
-            onClick={onNavigateToVideosPage}
-            className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-950 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          >
-            <Video size={20} />
-            <span className="font-semibold">Ver Galeria Completa</span>
-            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </motion.div>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 };

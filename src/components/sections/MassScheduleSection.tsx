@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Church, Clock, Calendar, ShieldCheck, MessageCircle, MapPin, HeartHandshake, Sparkles } from 'lucide-react';
 import { supabase, Celebration } from '../../lib/supabase';
 
@@ -151,7 +151,7 @@ export const MassScheduleSection: React.FC = () => {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.04 }}
-                    className={`rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between ${
+                    className={`rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between ${
                       isMatriz
                         ? 'bg-gradient-to-br from-[#2b0606] to-[#1c0303] text-white border-[#c5a059]/50 shadow-md ring-1 ring-[#c5a059]/20'
                         : 'bg-white text-stone-900 border-stone-200/80 hover:border-[#c5a059]/60 shadow-sm hover:shadow-md'
@@ -181,16 +181,13 @@ export const MassScheduleSection: React.FC = () => {
                         </span>
                       </div>
 
-                      <h3 className={`font-serif font-bold text-lg sm:text-xl leading-snug mb-1.5 ${isMatriz ? 'text-white' : 'text-[#240404]'}`}>
+                      <h3 className={`font-serif font-bold text-lg sm:text-xl leading-snug mb-1 ${isMatriz ? 'text-white' : 'text-[#240404]'}`}>
                         {item.community_name}
                       </h3>
 
-                      {item.celebrant_name && (
-                        <p className={`text-xs flex items-center gap-1.5 ${isMatriz ? 'text-stone-300' : 'text-stone-600'}`}>
-                          <span className="opacity-60">Presidente:</span>
-                          <span className="font-semibold">{item.celebrant_name}</span>
-                        </p>
-                      )}
+                      <p className={`text-xs ${isMatriz ? 'text-stone-300' : 'text-stone-500'} font-light`}>
+                        {isMatriz ? 'Comunidade Matriz Paroquial' : 'Comunidade Eclesial'}
+                      </p>
                     </div>
 
                     {isMatriz && (
