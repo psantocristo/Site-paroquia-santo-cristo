@@ -29,6 +29,7 @@ import { HomeSectionManager } from '../components/admin/HomeSectionManager';
 import { AnalyticsDashboard } from '../components/admin/AnalyticsDashboard';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import parishLogo from '../assets/logo-paroquia-white.png';
 
 interface AdminPageProps {
   onBack: () => void;
@@ -110,6 +111,27 @@ const getTabLabel = (tabId: string): string => {
     if (tab) return tab.label;
   }
   return 'Painel Administrativo';
+};
+
+const tabDescriptions: Record<string, string> = {
+  parish: 'Dados institucionais, contatos e indicadores de acesso do portal.',
+  logo: 'Identidade visual utilizada no cabeçalho, rodapé e páginas internas.',
+  'home-sections': 'Organize a página inicial e escolha quais seções ficam visíveis.',
+  cloudinary: 'Configuração da mídia, integridade da conexão e acompanhamento de cota.',
+  blog: 'Artigos, notícias e conteúdos pastorais de leitura longa.',
+  announcements: 'Comunicados, eventos e avisos publicados para a comunidade.',
+  popups: 'Alertas prioritários apresentados aos visitantes do site.',
+  videos: 'Vídeos, testemunhos e registros audiovisuais da paróquia.',
+  priests: 'Informações do clero responsável pelo atendimento pastoral.',
+  'priests-gallery': 'Perfis e registros históricos dos sacerdotes da comunidade.',
+  pastorals: 'Pastorais, movimentos e formas de participação comunitária.',
+  albums: 'Álbuns, capas e organização do acervo fotográfico.',
+  photos: 'Envio e manutenção das imagens publicadas nos álbuns.',
+  slides: 'Destaques exibidos no carrossel principal da página inicial.',
+  timeline: 'Marcos históricos apresentados na linha do tempo da paróquia.',
+  schedules: 'Horários de missas, confissões e celebrações nas comunidades.',
+  programs: 'Agenda de encontros, grupos e atividades recorrentes.',
+  documentations: 'Orientações para sacramentos, documentos e procedimentos.'
 };
 
 export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
@@ -201,35 +223,38 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="admin-shell h-screen bg-[#f3f4f6] flex flex-col overflow-hidden text-stone-800">
       {/* Header fixo */}
-      <header className="bg-[#240404] text-white border-b border-[#c5a059]/40 shadow-lg z-50 sticky top-0">
-        <div className="px-3 sm:px-6 py-3 sm:py-4">
+      <header className="bg-white text-stone-900 border-b border-stone-200 shadow-[0_1px_10px_rgba(28,3,3,0.05)] z-50 sticky top-0">
+        <div className="px-3 sm:px-6 py-2.5 sm:py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-4">
               {/* Botão hambúrguer mobile */}
               <button
                 onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-white/10 text-[#e8c872] cursor-pointer"
+                className="lg:hidden p-2 rounded-lg hover:bg-stone-100 text-[#4a1414] cursor-pointer"
                 aria-label="Abrir menu lateral"
               >
                 <Menu className="h-5 w-5" />
               </button>
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-stone-300 hover:text-[#e8c872] transition-colors cursor-pointer py-1 px-2.5 rounded-lg hover:bg-white/5"
+                className="flex items-center gap-2 text-stone-600 hover:text-[#4a1414] transition-colors cursor-pointer py-1.5 px-2.5 rounded-lg hover:bg-stone-100"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span className="hidden sm:inline text-xs font-semibold">Voltar ao Site</span>
               </button>
-              <div className="h-6 w-px bg-white/20 hidden sm:block" />
+              <div className="h-7 w-px bg-stone-200 hidden sm:block" />
               <div className="flex items-center gap-2">
-                <Home className="h-4 w-4 text-[#c5a059] hidden sm:block" />
-                <h1 className="text-base sm:text-lg font-serif font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
-                  Painel Administrativo
-                </h1>
+                <div className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg bg-[#240404] p-1.5">
+                  <img src={parishLogo} alt="Paróquia Senhor Santo Cristo" className="max-h-full max-w-full object-contain" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="truncate text-sm sm:text-base font-bold text-stone-900 max-w-[160px] sm:max-w-none">Painel da Paróquia</h1>
+                  <p className="hidden sm:block text-[11px] text-stone-500">Gestão institucional e pastoral</p>
+                </div>
                 {isSuperAdmin && (
-                  <span className="hidden xl:inline-flex items-center gap-1 rounded-sm border border-[#c5a059]/40 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#e8c872]">
+                  <span className="hidden xl:inline-flex items-center gap-1 rounded-full border border-[#dcbf6d]/60 bg-[#fbf7ec] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#6a501c]">
                     <ShieldCheck className="h-3 w-3" />
                     Super administrador
                   </span>
@@ -237,13 +262,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-semibold text-[#e8c872] hidden md:inline px-3 py-1 bg-white/5 rounded-full border border-[#c5a059]/30">
+              <span className="text-xs font-semibold text-stone-600 hidden md:inline px-3 py-1.5 bg-stone-50 rounded-full border border-stone-200">
                 {getTabLabel(activeTab)}
               </span>
               <Button 
                 variant="outline" 
                 onClick={handleSignOut}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-[#e8c872] px-3 py-1 text-xs"
+                className="px-3 py-1 text-xs"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline ml-1.5">Sair</span>
@@ -265,7 +290,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
         {/* Sidebar */}
         <aside 
           className={`
-            bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto 
+            bg-[#190b0c] border-r border-[#2f191a] flex-shrink-0 overflow-y-auto text-stone-200
             transition-all duration-300
             fixed lg:relative inset-y-0 left-0 z-50
             ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -273,17 +298,21 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
           `}
         >
           {/* Header da sidebar mobile */}
-          <div className="flex items-center justify-between p-4 border-b lg:hidden">
-            <span className="font-semibold text-gray-900">Menu</span>
+          <div className="flex items-center justify-between p-4 border-b border-white/10 lg:hidden">
+            <span className="font-semibold text-white">Menu de gestão</span>
             <button 
               onClick={() => setMobileSidebarOpen(false)}
-              className="p-1 rounded-lg hover:bg-gray-100"
+              className="p-1 rounded-lg hover:bg-white/10 text-stone-300"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="p-3">
+          <div className="px-3 py-5">
+            <div className="mb-5 px-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#dcbf6d]">Administração</p>
+              <p className="mt-1 text-xs leading-5 text-stone-400">Conteúdo, agenda e estrutura do portal.</p>
+            </div>
             <nav className="space-y-1">
               {tabGroups.map((group) => (
                 <div key={group.id} className="mb-2">
@@ -292,16 +321,16 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                     onClick={() => toggleGroup(group.id)}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150 font-medium cursor-pointer ${
                       expandedGroups.includes(group.id)
-                        ? 'bg-[#240404]/5 text-[#240404] font-bold'
-                        : 'text-stone-700 hover:bg-stone-100'
+                        ? 'bg-white/10 text-white font-bold'
+                        : 'text-stone-300 hover:bg-white/[0.07] hover:text-white'
                     }`}
                   >
-                    <group.icon className="h-4 w-4 text-[#c5a059] flex-shrink-0" />
+                    <group.icon className="h-4 w-4 text-[#dcbf6d] flex-shrink-0" />
                     <span className="flex-1 text-xs sm:text-sm">{group.label}</span>
                     {expandedGroups.includes(group.id) ? (
-                      <ChevronDown className="h-3.5 w-3.5 text-stone-400" />
+                      <ChevronDown className="h-3.5 w-3.5 text-stone-500" />
                     ) : (
-                      <ChevronRight className="h-3.5 w-3.5 text-stone-400" />
+                      <ChevronRight className="h-3.5 w-3.5 text-stone-500" />
                     )}
                   </button>
 
@@ -315,18 +344,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="ml-3 mt-1 space-y-0.5 border-l-2 border-[#c5a059]/30 pl-2.5">
+                        <div className="ml-3 mt-1 space-y-0.5 border-l border-white/10 pl-2.5">
                           {group.tabs.map((tab) => (
                             <button
                               key={tab.id}
                               onClick={() => handleTabClick(tab.id, group.id)}
                               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all duration-150 text-xs sm:text-sm cursor-pointer ${
                                 activeTab === tab.id
-                                  ? 'bg-[#240404] text-[#e8c872] shadow-sm font-bold'
-                                  : 'text-stone-600 hover:bg-stone-100 hover:text-[#240404]'
+                                  ? 'bg-[#f7f2e7] text-[#3c0d0d] shadow-sm font-bold'
+                                  : 'text-stone-400 hover:bg-white/[0.07] hover:text-white'
                               }`}
                             >
-                              <tab.icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === tab.id ? 'text-[#e8c872]' : 'text-stone-400'}`} />
+                              <tab.icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === tab.id ? 'text-[#8f6d25]' : 'text-stone-500'}`} />
                               <span className="truncate">{tab.label}</span>
                             </button>
                           ))}
@@ -341,13 +370,17 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Breadcrumb */}
-            <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-              <Home className="h-4 w-4" />
-              <span>/</span>
-              <span className="text-gray-900 font-medium">{getTabLabel(activeTab)}</span>
+        <main className="flex-1 overflow-y-auto bg-[#f5f5f4] p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-6 sm:mb-8">
+              <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f6d25]">
+                <Home className="h-3.5 w-3.5" />
+                <span>Painel administrativo</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-stone-900">{getTabLabel(activeTab)}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-500">
+                {tabDescriptions[activeTab] || 'Gerencie as informações e recursos deste módulo.'}
+              </p>
             </div>
 
             {/* Content Card */}
@@ -356,7 +389,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6"
+              className="admin-content-surface bg-white rounded-2xl shadow-[0_8px_30px_rgba(28,3,3,0.05)] border border-stone-200 p-4 sm:p-6 lg:p-8"
             >
               {renderContent()}
             </motion.div>

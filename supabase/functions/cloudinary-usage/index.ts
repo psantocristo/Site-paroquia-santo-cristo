@@ -6,6 +6,32 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+type CloudinaryMetric = {
+  usage?: number | string
+  used?: number | string
+  limit?: number | string
+  credits_limit?: number | string
+  used_percent?: number | string
+}
+
+const toNumber = (value: unknown): number => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const normalizeMetric = (metric: CloudinaryMetric = {}) => {
+  const used = toNumber(metric.usage ?? metric.used)
+  const limit = toNumber(metric.limit ?? metric.credits_limit)
+  const reportedPercent = toNumber(metric.used_percent)
+  const calculatedPercent = limit > 0 ? (used / limit) * 100 : 0
+
+  return {
+    used,
+    limit,
+    used_percent: Math.round((reportedPercent || calculatedPercent) * 100) / 100
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -91,46 +117,16 @@ serve(async (req) => {
     }
 
     const usageData = await usageResponse.json()
-    console.log('Cloudinary usage data received:', JSON.stringify(usageData, null, 2))
-
-    // Parse os dados de uso do Cloudinary
-    const storage = usageData.storage || {}
-    const bandwidth = usageData.bandwidth || {}
-    const transformations = usageData.transformations || {}
-    const credits = usageData.credits || {}
-
-    // Calcular percentuais com base nos limites do plano
-    const storageUsed = storage.usage || 0
-    const storageLimit = storage.credits_limit || storage.limit || 25 * 1024 * 1024 * 1024 // 25GB default free
-    const storagePercent = storageLimit > 0 ? (storageUsed / storageLimit) * 100 : 0
-
-    const bandwidthUsed = bandwidth.usage || 0
-    const bandwidthLimit = bandwidth.credits_limit || bandwidth.limit || 25 * 1024 * 1024 * 1024 // 25GB default free
-    const bandwidthPercent = bandwidthLimit > 0 ? (bandwidthUsed / bandwidthLimit) * 100 : 0
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         usage: {
-          storage: {
-            used: storageUsed,
-            limit: storageLimit,
-            used_percent: Math.round(storagePercent * 100) / 100
-          },
-          bandwidth: {
-            used: bandwidthUsed,
-            limit: bandwidthLimit,
-            used_percent: Math.round(bandwidthPercent * 100) / 100
-          },
-          transformations: {
-            used: transformations.usage || 0,
-            limit: transformations.credits_limit || transformations.limit || 25000
-          },
-          credits: {
-            used: credits.usage || 0,
-            limit: credits.limit || 25,
-            used_percent: credits.used_percent || 0
-          },
+          storage: normalizeMetric(usageData.storage),
+          bandwidth: normalizeMetric(usageData.bandwidth),
+          transformations: normalizeMetric(usageData.transformations),
+          credits: normalizeMetric(usageData.credits),
+          resources: toNumber(usageData.resources),
           plan: usageData.plan || 'Free',
           last_updated: usageData.last_updated || new Date().toISOString()
         }

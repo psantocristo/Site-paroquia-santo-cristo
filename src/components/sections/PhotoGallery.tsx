@@ -154,7 +154,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
         </div>
 
         {/* Albums Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
           {albums.slice(0, 3).map((album, index) => (
             <motion.article
               key={album.id}
@@ -168,47 +168,40 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
               }}
               role="link"
               tabIndex={0}
-              className="group relative rounded-lg overflow-hidden bg-stone-900 border border-stone-300 hover:border-[#c5a059] shadow-sm transition-colors cursor-pointer flex flex-col justify-end aspect-[4/3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8f6d25]"
+              className="group overflow-hidden rounded-xl border border-stone-200 bg-white shadow-[0_8px_30px_rgba(36,4,4,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-[#c5a059]/70 hover:shadow-[0_16px_40px_rgba(36,4,4,0.12)] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8f6d25]"
             >
-              {/* Background Photo */}
-              {album.cover_image_url ? (
-                <img
-                  src={album.cover_image_url}
-                  alt={album.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#240404] to-[#1c0303] flex items-center justify-center">
-                  <Folder className="h-12 w-12 text-[#c5a059]/40" />
-                </div>
-              )}
-
-              {/* Gradient Scrim */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/95 transition-colors duration-300" />
-
-              {/* Card Top Pill: Count */}
-              <div className="absolute top-3 left-3 z-10">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-[#e8c872] text-[11px] font-bold tracking-wide border border-white/15">
-                  <Images className="h-3 w-3 text-[#e8c872]" />
+              <div className="relative aspect-[16/10] overflow-hidden bg-stone-100">
+                {album.cover_image_url ? (
+                  <img
+                    src={album.cover_image_url}
+                    alt={album.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#f4efe7] to-[#e8dfd1]">
+                    <Folder className="h-12 w-12 text-[#8f6d25]/45" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-[#1c1111]/85 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-sm backdrop-blur-md">
+                  <Images className="h-3.5 w-3.5 text-[#e8c872]" />
                   {album.photoCount || 0} fotos
                 </span>
               </div>
 
-              {/* Card Bottom Content */}
-              <div className="relative z-10 p-4 sm:p-5 space-y-1">
-                <h3 className="font-serif font-bold text-lg sm:text-xl text-white group-hover:text-[#e8c872] transition-colors leading-snug line-clamp-2">
+              <div className="flex min-h-[190px] flex-col p-5 sm:p-6">
+                <h3 className="font-serif text-xl font-semibold leading-snug text-[#240404] transition-colors group-hover:text-[#7a2020] line-clamp-2">
                   {album.name}
                 </h3>
                 {album.description && (
-                  <p className="hidden sm:block text-stone-300 text-xs font-light line-clamp-1 leading-relaxed">
+                  <p className="mt-2 text-sm leading-6 text-stone-600 line-clamp-3">
                     {album.description}
                   </p>
                 )}
-
-                <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-[#e8c872] opacity-90 group-hover:opacity-100 transition-opacity">
+                <div className="mt-auto flex items-center gap-2 border-t border-stone-100 pt-4 text-xs font-bold uppercase tracking-[0.12em] text-[#7a2020]">
                   <span>Abrir álbum</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             </motion.article>
