@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Lock } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import parishLogo from '../../assets/logo-paroquia.png';
+import parishLogo from '../../assets/logo-paroquia-white.png';
 
 interface FooterProps {
   onNavigate: (section: string) => void;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import parishLogo from '../../assets/logo-paroquia.png';
+import parishLogo from '../../assets/logo-paroquia-white.png';
 
 interface HeaderProps {
   onNavigate: (section: string) => void;
