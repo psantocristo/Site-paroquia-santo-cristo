@@ -8,10 +8,9 @@ import { toast } from 'react-hot-toast';
 
 interface VideoTestimonialsPageProps {
   onBack: () => void;
-  onNavigate: (section: string) => void;
 }
 
-export const VideoTestimonialsPage: React.FC<VideoTestimonialsPageProps> = ({ onBack, onNavigate }) => {
+export const VideoTestimonialsPage: React.FC<VideoTestimonialsPageProps> = ({ onBack }) => {
   const [videos, setVideos] = useState<VideoTestimonial[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);

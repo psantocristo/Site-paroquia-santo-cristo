@@ -1,0 +1,16 @@
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void | Promise<void>) => unknown;
+};
+
+export const runViewTransition = (update: () => void) => {
+  const documentWithTransitions = document as ViewTransitionDocument;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!documentWithTransitions.startViewTransition || reduceMotion) {
+    update();
+    return;
+  }
+
+  documentWithTransitions.startViewTransition(update);
+};
+

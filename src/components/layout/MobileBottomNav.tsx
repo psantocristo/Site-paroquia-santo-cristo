@@ -19,7 +19,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const items = [
     { id: 'home', label: 'Início', icon: Home },
     { id: 'announcements', label: 'Avisos', icon: Bell },
-    { id: 'programs', label: 'Missas & Agenda', icon: Calendar },
+    { id: 'programs', label: 'Agenda', icon: Calendar },
     { id: 'photos', label: 'Fotos', icon: ImageIcon },
   ] as const;
 

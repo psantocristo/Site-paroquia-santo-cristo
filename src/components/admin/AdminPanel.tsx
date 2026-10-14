@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, FileText, Image, Calendar, Users, LogOut, X, Video, DollarSign, BarChart3, FileCheck } from 'lucide-react';
+import { Settings, FileText, Image, Calendar, Users, LogOut, X, Video, FileCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { ParishManager } from './ParishManager';
 import { PhotoManager } from './PhotoManager';
@@ -8,7 +8,7 @@ import { TimelineManager } from './TimelineManager';
 import { SlideManager } from './SlideManager';
 import { BlogManager } from './BlogManager';
 import { AnnouncementManager } from './AnnouncementManager';
-import { ScheduleManager } from './ScheduleManager';
+import { CelebrationManager } from './CelebrationManager';
 import { PriestManager } from './PriestManager';
 import { PriestGalleryManager } from './PriestGalleryManager';
 import { CloudinarySettings } from './CloudinarySettings';
@@ -18,10 +18,6 @@ import { UrgentPopupManager } from './UrgentPopupManager';
 import { AlbumManager } from './AlbumManager';
 import { LogoManager } from './LogoManager';
 import { VideoTestimonialManager } from './VideoTestimonialManager';
-import { CampaignManager } from './CampaignManager';
-import { PaymentSettingsManager } from './PaymentSettingsManager';
-import { TransactionsPanel } from './TransactionsPanel';
-import { ReportsPanel } from './ReportsPanel';
 import { DocumentationManager } from './DocumentationManager';
 import { HomeSectionManager } from './HomeSectionManager';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
@@ -42,10 +38,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     { id: 'cloudinary', label: 'Cloudinary', icon: Settings },
     { id: 'popups', label: 'Pop-ups Urgentes', icon: Calendar },
     { id: 'pastorals', label: 'Pastorais', icon: Users },
-    { id: 'campaigns', label: 'Campanhas', icon: DollarSign },
-    { id: 'transactions', label: 'Transações', icon: DollarSign },
-    { id: 'reports', label: 'Relatórios', icon: BarChart3 },
-    { id: 'payment-settings', label: 'Pagamentos', icon: Settings },
     { id: 'documentations', label: 'Documentações', icon: FileCheck },
     { id: 'announcements', label: 'Eventos e Avisos', icon: Calendar },
     { id: 'blog', label: 'Blog', icon: FileText },
@@ -57,7 +49,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     { id: 'photos', label: 'Galeria de Fotos', icon: Image },
     { id: 'timeline', label: 'Linha do Tempo', icon: Calendar },
     { id: 'slides', label: 'Slides do Site', icon: Settings },
-    { id: 'schedules', label: 'Horários de Celebrações', icon: Calendar }
+    { id: 'schedules', label: 'Missas e Celebrações', icon: Calendar }
   ];
 
   const handleSignOut = async () => {
@@ -65,7 +57,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       await supabase.auth.signOut();
       toast.success('Logout realizado com sucesso');
       onClose();
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer logout');
     }
   };
@@ -91,14 +83,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         return <UrgentPopupManager />;
       case 'pastorals':
         return <PastoralManager />;
-      case 'campaigns':
-        return <CampaignManager />;
-      case 'payment-settings':
-        return <PaymentSettingsManager />;
-      case 'transactions':
-        return <TransactionsPanel />;
-      case 'reports':
-        return <ReportsPanel />;
       case 'documentations':
         return <DocumentationManager />;
       case 'announcements':
@@ -122,7 +106,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       case 'slides':
         return <SlideManager />;
       case 'schedules':
-        return <ScheduleManager />;
+        return <CelebrationManager />;
       default:
         return <ParishManager />;
     }

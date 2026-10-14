@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Folder, Camera, Images, Eye, ChevronRight } from 'lucide-react';
+import { ArrowRight, Folder, Camera, Images, ChevronRight } from 'lucide-react';
 import { supabase, PhotoAlbum } from '../../lib/supabase';
 
 interface PhotoGalleryProps {
@@ -35,10 +35,13 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
       if (albumsError) throw albumsError;
 
       if (albumsData && albumsData.length > 0) {
-        const albumsWithCount = albumsData.map(album => ({
-          ...album,
-          photoCount: (album.photos as any)?.[0]?.count || 0
-        }));
+        const albumsWithCount = albumsData.map(album => {
+          const counts = album.photos as Array<{ count?: number }> | null;
+          return {
+            ...album,
+            photoCount: counts?.[0]?.count || 0
+          };
+        });
         setAlbums(albumsWithCount);
       } else {
         const defaultAlbums: AlbumWithCount[] = [
@@ -132,11 +135,11 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-wider mb-2.5">
+            <div className="institutional-kicker">
               <Camera className="h-3.5 w-3.5 text-[#c5a059]" />
-              <span>Memórias & Comunidade</span>
+              <span>Acervo paroquial</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight">
+            <h2 className="institutional-title">
               Galeria de Fotos
             </h2>
           </div>
@@ -151,8 +154,8 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
         </div>
 
         {/* Albums Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {albums.slice(0, 4).map((album, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          {albums.slice(0, 3).map((album, index) => (
             <motion.article
               key={album.id}
               initial={{ opacity: 0, y: 15 }}
@@ -160,14 +163,19 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: index * 0.05 }}
               onClick={() => handleAlbumClick(album)}
-              className="group relative rounded-2xl overflow-hidden bg-stone-900 border border-stone-200/80 hover:border-[#c5a059] shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-end aspect-[4/5]"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') handleAlbumClick(album);
+              }}
+              role="link"
+              tabIndex={0}
+              className="group relative rounded-lg overflow-hidden bg-stone-900 border border-stone-300 hover:border-[#c5a059] shadow-sm transition-colors cursor-pointer flex flex-col justify-end aspect-[4/3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8f6d25]"
             >
               {/* Background Photo */}
               {album.cover_image_url ? (
                 <img
                   src={album.cover_image_url}
                   alt={album.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
                 />
               ) : (
@@ -188,12 +196,12 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ onNavigateToFullGall
               </div>
 
               {/* Card Bottom Content */}
-              <div className="relative z-10 p-5 space-y-1.5">
+              <div className="relative z-10 p-4 sm:p-5 space-y-1">
                 <h3 className="font-serif font-bold text-lg sm:text-xl text-white group-hover:text-[#e8c872] transition-colors leading-snug line-clamp-2">
                   {album.name}
                 </h3>
                 {album.description && (
-                  <p className="text-stone-300 text-xs font-light line-clamp-2 leading-relaxed">
+                  <p className="hidden sm:block text-stone-300 text-xs font-light line-clamp-1 leading-relaxed">
                     {album.description}
                   </p>
                 )}

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Settings, FileText, Image, Calendar, Users, LogOut, 
-  Video, DollarSign, BarChart3, FileCheck, ChevronDown, ChevronRight,
+  Settings, FileText, Image, Calendar, Users, LogOut,
+  Video, FileCheck, ChevronDown, ChevronRight,
   Home, Newspaper, AlertCircle, Heart, FolderOpen, Clock,
-  ListTodo, Target, Receipt, CreditCard, LayoutGrid, Cloud,
-  User, Presentation, ArrowLeft, Menu, X
+  ListTodo, LayoutGrid, Cloud,
+  User, Presentation, ArrowLeft, Menu, X, ShieldCheck
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { ParishManager } from '../components/admin/ParishManager';
@@ -14,7 +14,7 @@ import { TimelineManager } from '../components/admin/TimelineManager';
 import { SlideManager } from '../components/admin/SlideManager';
 import { BlogManager } from '../components/admin/BlogManager';
 import { AnnouncementManager } from '../components/admin/AnnouncementManager';
-import { ScheduleManager } from '../components/admin/ScheduleManager';
+import { CelebrationManager } from '../components/admin/CelebrationManager';
 import { PriestManager } from '../components/admin/PriestManager';
 import { PriestGalleryManager } from '../components/admin/PriestGalleryManager';
 import { CloudinarySettings } from '../components/admin/CloudinarySettings';
@@ -24,10 +24,6 @@ import { UrgentPopupManager } from '../components/admin/UrgentPopupManager';
 import { AlbumManager } from '../components/admin/AlbumManager';
 import { LogoManager } from '../components/admin/LogoManager';
 import { VideoTestimonialManager } from '../components/admin/VideoTestimonialManager';
-import { CampaignManager } from '../components/admin/CampaignManager';
-import { PaymentSettingsManager } from '../components/admin/PaymentSettingsManager';
-import { TransactionsPanel } from '../components/admin/TransactionsPanel';
-import { ReportsPanel } from '../components/admin/ReportsPanel';
 import { DocumentationManager } from '../components/admin/DocumentationManager';
 import { HomeSectionManager } from '../components/admin/HomeSectionManager';
 import { AnalyticsDashboard } from '../components/admin/AnalyticsDashboard';
@@ -100,20 +96,9 @@ const tabGroups: TabGroup[] = [
     label: 'Operacional',
     icon: Calendar,
     tabs: [
-      { id: 'schedules', label: 'Horários de Celebrações', icon: Calendar },
+      { id: 'schedules', label: 'Missas e Celebrações', icon: Calendar },
       { id: 'programs', label: 'Programações', icon: ListTodo },
       { id: 'documentations', label: 'Documentações', icon: FileCheck },
-    ]
-  },
-  {
-    id: 'financeiro',
-    label: 'Financeiro',
-    icon: DollarSign,
-    tabs: [
-      { id: 'campaigns', label: 'Campanhas', icon: Target },
-      { id: 'transactions', label: 'Transações', icon: Receipt },
-      { id: 'reports', label: 'Relatórios', icon: BarChart3 },
-      { id: 'payment-settings', label: 'Pagamentos', icon: CreditCard },
     ]
   },
 ];
@@ -131,13 +116,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState('parish');
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['geral']);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    supabase.rpc('is_super_admin').then(({ data }) => setIsSuperAdmin(data === true));
+  }, []);
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
       toast.success('Logout realizado com sucesso');
       onBack();
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer logout');
     }
   };
@@ -181,14 +171,6 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
         return <UrgentPopupManager />;
       case 'pastorals':
         return <PastoralManager />;
-      case 'campaigns':
-        return <CampaignManager />;
-      case 'payment-settings':
-        return <PaymentSettingsManager />;
-      case 'transactions':
-        return <TransactionsPanel />;
-      case 'reports':
-        return <ReportsPanel />;
       case 'documentations':
         return <DocumentationManager />;
       case 'announcements':
@@ -212,7 +194,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
       case 'slides':
         return <SlideManager />;
       case 'schedules':
-        return <ScheduleManager />;
+        return <CelebrationManager />;
       default:
         return <ParishManager />;
     }
@@ -246,6 +228,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                 <h1 className="text-base sm:text-lg font-serif font-bold text-white tracking-wide truncate max-w-[150px] sm:max-w-none">
                   Painel Administrativo
                 </h1>
+                {isSuperAdmin && (
+                  <span className="hidden xl:inline-flex items-center gap-1 rounded-sm border border-[#c5a059]/40 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#e8c872]">
+                    <ShieldCheck className="h-3 w-3" />
+                    Super administrador
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">

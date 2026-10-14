@@ -5,6 +5,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { supabase, BlogPost } from '../../lib/supabase';
+import DOMPurify from 'dompurify';
 
 interface BlogSectionProps {
   onNavigateHome?: () => void;
@@ -337,7 +338,7 @@ export const BlogSection: React.FC<BlogSectionProps> = () => {
 
               <div
                 className="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-700 leading-relaxed prose-headings:text-gray-800 prose-a:text-red-800 prose-strong:text-gray-800 prose-blockquote:border-red-800 prose-blockquote:bg-red-50"
-                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPost.content) }}
               />
 
               <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200 text-center">

@@ -4,6 +4,7 @@ import { ChevronDown, FileText, Download, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { SEO } from '../components/ui/SEO';
 import toast from 'react-hot-toast';
+import DOMPurify from 'dompurify';
 
 interface Documentation {
   id: string;
@@ -28,13 +29,13 @@ export const DocumentationsPage: React.FC = () => {
   const fetchDocumentations = async () => {
     try {
       const { data, error } = await supabase
-        .from('documentation_procedures' as any)
+        .from('documentation_procedures')
         .select('*')
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 
       if (error) throw error;
-      setDocumentations(data as any || []);
+      setDocumentations(data || []);
     } catch (error) {
       console.error('Error fetching documentations:', error);
       toast.error('Erro ao carregar documentações');
@@ -184,7 +185,7 @@ export const DocumentationsPage: React.FC = () => {
                               prose-strong:text-red-950
                               prose-li:text-stone-700
                               prose-a:text-red-800 prose-a:underline"
-                            dangerouslySetInnerHTML={{ __html: doc.content }}
+                                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doc.content) }}
                           />
                         </div>
                       </motion.div>

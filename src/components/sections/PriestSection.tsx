@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Church, Mail, Phone, Heart, Award, ChevronRight } from 'lucide-react';
+import { Church } from 'lucide-react';
 import { supabase, Priest } from '../../lib/supabase';
 
 export const PriestSection: React.FC = () => {
@@ -17,7 +17,7 @@ export const PriestSection: React.FC = () => {
         .from('priests')
         .select('*')
         .eq('is_active', true)
-        .order('order_index', { ascending: true });
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       if (data) setPriests(data);
@@ -38,18 +38,13 @@ export const PriestSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-widest mb-3">
+          <div className="institutional-kicker">
             <Church className="h-3.5 w-3.5 text-[#c5a059]" />
-            <span>Pastoral & Clero</span>
+            <span>Clero paroquial</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight">
+          <h2 className="institutional-title">
             Nossos Sacerdotes
           </h2>
-          <div className="flex items-center justify-center gap-3 my-2">
-            <div className="h-px w-12 bg-[#c5a059]/40" />
-            <span className="text-[#c5a059] text-xs">✦</span>
-            <div className="h-px w-12 bg-[#c5a059]/40" />
-          </div>
           <p className="text-stone-600 text-sm sm:text-base font-light">
             Conheça os sacerdotes dedicados ao cuidado pastoral e espiritual da nossa paróquia.
           </p>
@@ -61,12 +56,12 @@ export const PriestSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="bg-[#faf7f2] rounded-3xl border border-[#c5a059]/40 p-6 sm:p-8 lg:p-10 shadow-sm mb-8"
+          className="institutional-card bg-[#faf7f2] p-6 sm:p-8 lg:p-10 mb-8"
         >
           <div className="flex flex-col md:flex-row items-center gap-8 lg:gap-12">
             {/* Photo with refined frame */}
             <div className="relative shrink-0">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-2 border-[#c5a059] shadow-md bg-stone-100">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-md overflow-hidden border border-[#c5a059] bg-stone-100">
                 {mainPriest.photo_url ? (
                   <img
                     src={mainPriest.photo_url}
@@ -79,7 +74,7 @@ export const PriestSection: React.FC = () => {
                   </div>
                 )}
               </div>
-              <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#240404] text-[#e8c872] text-[11px] font-bold uppercase tracking-wider rounded-full shadow border border-[#c5a059]/40 whitespace-nowrap">
+              <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#240404] text-[#e8c872] text-[11px] font-bold uppercase tracking-wider rounded-sm border border-[#c5a059]/40 whitespace-nowrap">
                 {mainPriest.title || 'Pároco'}
               </span>
             </div>
@@ -90,22 +85,16 @@ export const PriestSection: React.FC = () => {
                 <h3 className="font-serif font-bold text-2xl sm:text-3xl md:text-4xl text-[#240404] mb-1">
                   {mainPriest.name}
                 </h3>
-                {mainPriest.ordination_date && (
+                {mainPriest.ordination_year && (
                   <p className="text-xs sm:text-sm font-semibold text-[#c5a059]">
-                    Ordenação Sacerdotal: {new Date(mainPriest.ordination_date).toLocaleDateString('pt-BR')}
+                    Ordenação Sacerdotal: {mainPriest.ordination_year}
                   </p>
                 )}
               </div>
 
               <p className="text-stone-700 text-sm sm:text-base leading-relaxed font-light">
-                {mainPriest.bio || 'Dedicado ao anúncio do Evangelho e ao acolhimento de toda a comunidade paroquial.'}
+                {mainPriest.short_bio || 'Dedicado ao anúncio do Evangelho e ao acolhimento de toda a comunidade paroquial.'}
               </p>
-
-              {mainPriest.quote && (
-                <blockquote className="p-3 bg-white/70 rounded-xl border-l-4 border-[#c5a059] italic text-stone-600 text-xs sm:text-sm font-serif">
-                  "{mainPriest.quote}"
-                </blockquote>
-              )}
             </div>
           </div>
         </motion.div>
@@ -139,9 +128,9 @@ export const PriestSection: React.FC = () => {
                   <h4 className="font-serif font-bold text-base text-[#240404] truncate">
                     {priest.name}
                   </h4>
-                  {priest.bio && (
+                  {priest.short_bio && (
                     <p className="text-xs text-stone-600 line-clamp-1 font-light">
-                      {priest.bio}
+                      {priest.short_bio}
                     </p>
                   )}
                 </div>

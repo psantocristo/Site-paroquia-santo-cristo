@@ -76,9 +76,26 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #8f6d25;
+    outline-offset: 3px;
+  }
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: ease-out;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -88,6 +105,8 @@
     
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
       image-rendering: auto; /* Mudado para auto para melhor compressão */
     }
   }
@@ -130,6 +149,41 @@
 }
 
 @layer components {
+  .institutional-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid #a98537;
+    color: #4a1515;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .institutional-title {
+    color: #240404;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .institutional-card {
+    border: 1px solid #e7e1d8;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(36, 4, 4, 0.05);
+  }
+
+  .institutional-card:hover {
+    border-color: #c9b57c;
+    box-shadow: 0 5px 16px rgba(36, 4, 4, 0.08);
+  }
+
   /* Card mobile optimization */
   .card-mobile {
     min-height: 44px;

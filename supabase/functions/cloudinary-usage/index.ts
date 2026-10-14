@@ -12,9 +12,31 @@ serve(async (req) => {
   }
 
   try {
+    const authorization = req.headers.get('Authorization')
+    if (!authorization) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Não autorizado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authorization } },
+      auth: { persistSession: false }
+    })
+    const { data: isAdmin, error: adminError } = await authClient.rpc('is_admin')
+    if (adminError || !isAdmin) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Acesso administrativo necessário' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Buscar credenciais do Cloudinary no Supabase
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
+      supabaseUrl,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 

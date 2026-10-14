@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { motion } from 'framer-motion';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '../ui/Card';
@@ -249,8 +250,8 @@ export const TimelineSection: React.FC = () => {
                       content.className = 'relative max-w-4xl max-h-[95vh] bg-white rounded-xl overflow-hidden shadow-2xl';
                       content.onclick = (e) => e.stopPropagation();
                       
-                      content.innerHTML = `
-                        <button class="absolute top-4 right-4 z-10 bg-white/95 hover:bg-white shadow-lg rounded-full w-10 h-10 flex items-center justify-center" onclick="this.closest('.fixed').remove()">
+                      content.innerHTML = DOMPurify.sanitize(`
+                        <button type="button" aria-label="Fechar imagem" class="absolute top-4 right-4 z-10 bg-white/95 hover:bg-white shadow-lg rounded-full w-10 h-10 flex items-center justify-center">
                           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                           </svg>
@@ -272,7 +273,8 @@ export const TimelineSection: React.FC = () => {
                             <p class="text-gray-700 leading-relaxed text-lg">${currentEvent.description}</p>
                           </div>
                         </div>
-                      `;
+                      `);
+                      content.querySelector('button')?.addEventListener('click', () => modal.remove());
                       
                       modal.appendChild(content);
                       document.body.appendChild(modal);

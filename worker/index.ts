@@ -6,11 +6,11 @@ export interface Env {
 }
 
 const DEFAULT_SUPABASE_URL = 'https://esbkvwfogqgcttgzsyqr.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzYmt2d2ZvZ3FnY3R0Z3pzeXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMTY4MDgsImV4cCI6MjEwMjY5MjgwOH0.HdXZK30MI9sihapoj9GIMYraXYbbFXl_BAHa9Viz5jY';
+const DEFAULT_SUPABASE_ANON_KEY = '';
 const DEFAULT_BASE_URL = 'https://paroquiasantocristo.com.br';
 const DEFAULT_IMAGE = 'https://paroquiasantocristo.com.br/capa.webp';
 const SITE_NAME = 'Paróquia Senhor Santo Cristo dos Milagres';
-const DEFAULT_DESCRIPTION = 'Site Oficial da Paróquia Senhor Santo Cristo dos Milagres em Cidade Tiradentes - SP. Celebrações, avisos, pastorais, horários de missas e campanhas de doação.';
+const DEFAULT_DESCRIPTION = 'Site Oficial da Paróquia Senhor Santo Cristo dos Milagres em Cidade Tiradentes - SP. Celebrações, avisos, pastorais e horários de missas.';
 
 function isBot(userAgent: string): boolean {
   const bots = [
@@ -113,11 +113,10 @@ async function handleSitemap(env: Env, requestUrl: string): Promise<Response> {
   const baseUrl = (env.BASE_URL && !env.BASE_URL.includes('workers.dev')) ? env.BASE_URL : urlObj.origin;
   const today = new Date().toISOString().split('T')[0];
 
-  const [blogPosts, albums, announcements, campaigns, programs] = await Promise.all([
+  const [blogPosts, albums, announcements, programs] = await Promise.all([
     fetchSupabase('blog_posts?is_published=eq.true&select=slug,updated_at', env),
     fetchSupabase('photo_albums?is_active=eq.true&select=slug,updated_at', env),
     fetchSupabase('parish_announcements?is_published=eq.true&select=slug,updated_at', env),
-    fetchSupabase('campaigns?is_published=eq.true&select=slug,updated_at', env),
     fetchSupabase('programs?is_active=eq.true&select=slug,updated_at', env),
   ]);
 
@@ -128,7 +127,6 @@ async function handleSitemap(env: Env, requestUrl: string): Promise<Response> {
     '<url><loc>' + baseUrl + '/festa-padroeiro</loc><lastmod>' + today + '</lastmod><priority>0.8</priority></url>' +
     '<url><loc>' + baseUrl + '/programacoes</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>' +
     '<url><loc>' + baseUrl + '/avisos</loc><lastmod>' + today + '</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>' +
-    '<url><loc>' + baseUrl + '/campanhas</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>' +
     '<url><loc>' + baseUrl + '/galeria-dos-padres</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>' +
     '<url><loc>' + baseUrl + '/documentacoes</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>' +
     '<url><loc>' + baseUrl + '/eventos-informativos</loc><lastmod>' + today + '</lastmod><priority>0.7</priority></url>';
@@ -144,13 +142,6 @@ async function handleSitemap(env: Env, requestUrl: string): Promise<Response> {
     for (const item of announcements) {
       if (item && item.slug) {
         xml += '<url><loc>' + baseUrl + '/aviso/' + item.slug + '</loc><lastmod>' + (item.updated_at ? item.updated_at.split('T')[0] : today) + '</lastmod><priority>0.9</priority></url>';
-      }
-    }
-  }
-  if (Array.isArray(campaigns)) {
-    for (const c of campaigns) {
-      if (c && c.slug) {
-        xml += '<url><loc>' + baseUrl + '/campanha/' + c.slug + '</loc><lastmod>' + (c.updated_at ? c.updated_at.split('T')[0] : today) + '</lastmod><priority>0.9</priority></url>';
       }
     }
   }
@@ -227,24 +218,6 @@ export default {
         }
       }
 
-      if (pathname.startsWith('/campanha/')) {
-        const slug = pathname.replace('/campanha/', '').split('/')[0];
-        const data = await fetchSupabase('campaigns?slug=eq.' + slug + '&is_active=eq.true&select=*', env);
-        if (data && data.length > 0) {
-          const c = data[0];
-          return new Response(
-            generateHTML({
-              title: c.title + ' | Doações - ' + SITE_NAME,
-              description: truncate(stripHtml(c.description), 160),
-              image: c.featured_image || DEFAULT_IMAGE,
-              url: baseUrl + '/campanha/' + slug,
-              type: 'campaign',
-            }),
-            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-          );
-        }
-      }
-
       if (pathname.startsWith('/album/') || pathname.startsWith('/albuns/')) {
         const slug = pathname.replace(/^\/albu(m|ns)\//, '').split('/')[0];
         const data = await fetchSupabase('photo_albums?slug=eq.' + slug + '&is_active=eq.true&select=*', env);
@@ -279,19 +252,6 @@ export default {
             { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
           );
         }
-      }
-
-      // Institutional static routes for bots
-      if (pathname === '/campanhas') {
-        return new Response(
-          generateHTML({
-            title: 'Campanhas & Doações | ' + SITE_NAME,
-            description: 'Colabore com as obras sociais, reformas e projetos da Paróquia Senhor Santo Cristo dos Milagres.',
-            image: DEFAULT_IMAGE,
-            url: baseUrl + '/campanhas',
-          }),
-          { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-        );
       }
 
       if (pathname === '/avisos') {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Eye, EyeOff, TestTube, CheckCircle, XCircle, Cloud, BarChart3, RefreshCw } from 'lucide-react';
+import { Save, TestTube, CheckCircle, XCircle, Cloud, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { supabase } from '../../lib/supabase';
@@ -16,16 +16,22 @@ interface CloudinaryUsage {
   last_updated: string;
 }
 
+interface CloudinarySettingsState {
+  cloudinary_cloud_name: string;
+  cloudinary_api_key: string;
+  cloudinary_upload_preset: string;
+  cloudinary_enabled: boolean;
+  supabase_storage_enabled: boolean;
+}
+
 export const CloudinarySettings: React.FC = () => {
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<CloudinarySettingsState>({
     cloudinary_cloud_name: '',
     cloudinary_api_key: '',
-    cloudinary_api_secret: '',
     cloudinary_upload_preset: 'parish_uploads',
     cloudinary_enabled: false,
     supabase_storage_enabled: true
   });
-  const [showSecret, setShowSecret] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
@@ -77,7 +83,6 @@ export const CloudinarySettings: React.FC = () => {
         .in('key', [
           'cloudinary_cloud_name',
           'cloudinary_api_key',
-          'cloudinary_api_secret',
           'cloudinary_upload_preset',
         'cloudinary_enabled',
         'supabase_storage_enabled'
@@ -85,16 +90,20 @@ export const CloudinarySettings: React.FC = () => {
 
       if (error) throw error;
 
-      const settingsMap = data?.reduce((acc, setting) => {
+      const settingsMap = data?.reduce<Partial<CloudinarySettingsState>>((acc, setting) => {
         if (setting.key === 'cloudinary_enabled') {
-          acc[setting.key] = setting.value === 'true';
+          acc.cloudinary_enabled = setting.value === 'true';
         } else if (setting.key === 'supabase_storage_enabled') {
-          acc[setting.key] = setting.value === 'true';
-        } else {
-          acc[setting.key] = setting.value;
+          acc.supabase_storage_enabled = setting.value === 'true';
+        } else if (setting.key === 'cloudinary_cloud_name') {
+          acc.cloudinary_cloud_name = setting.value;
+        } else if (setting.key === 'cloudinary_api_key') {
+          acc.cloudinary_api_key = setting.value;
+        } else if (setting.key === 'cloudinary_upload_preset') {
+          acc.cloudinary_upload_preset = setting.value;
         }
         return acc;
-      }, {} as any) || {};
+      }, {}) || {};
 
       setSettings(prev => ({ ...prev, ...settingsMap }));
     } catch (error) {
@@ -352,30 +361,6 @@ export const CloudinarySettings: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                API Secret *
-              </label>
-              <div className="relative">
-                <input
-                  type={showSecret ? "text" : "password"}
-                  value={settings.cloudinary_api_secret}
-                  onChange={(e) => setSettings(prev => ({ ...prev, cloudinary_api_secret: e.target.value }))}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="••••••••••••••••••••••••"
-                  disabled={!settings.cloudinary_enabled}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowSecret(!showSecret)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  disabled={!settings.cloudinary_enabled}
-                >
-                  {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Preset
               </label>
               <input
@@ -421,7 +406,7 @@ export const CloudinarySettings: React.FC = () => {
                 <li>Vá para Dashboard → Settings → Account</li>
                 <li>Copie o <strong>Cloud Name</strong></li>
                 <li>Copie a <strong>API Key</strong></li>
-                <li>Copie o <strong>API Secret</strong></li>
+                <li>Guarde o <strong>API Secret</strong> somente nos segredos das funções do servidor</li>
               </ul>
             </div>
 

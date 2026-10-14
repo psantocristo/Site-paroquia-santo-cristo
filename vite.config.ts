@@ -2,16 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { componentTagger } from 'lovable-tagger';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  plugins: [
-    react(),
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: [{ find: '@', replacement: path.resolve(__dirname, './src') }],
     dedupe: [
@@ -53,10 +49,10 @@ export default defineConfig(({ mode }) => ({
     force: true,
   },
   server: {
-    host: '::',
+    host: '127.0.0.1',
     port: 8080,
     headers: {
       'Cache-Control': 'no-store',
     },
   },
-}));
+});

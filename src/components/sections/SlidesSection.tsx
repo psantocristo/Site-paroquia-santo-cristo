@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { supabase, Slide } from '../../lib/supabase';
+import { getSafeHttpUrl, getSafeInternalPath } from '../../utils/safeUrl';
 
 export const SlidesSection: React.FC = () => {
   const [slides, setSlides] = useState<Slide[]>([]);
@@ -30,7 +31,7 @@ export const SlidesSection: React.FC = () => {
           setTransitionTime(seconds * 1000);
         }
       }
-    } catch (error) {
+    } catch {
       console.log('Using default slide transition time');
     }
   };
@@ -127,13 +128,17 @@ export const SlidesSection: React.FC = () => {
     if (!slide.button_link) return;
 
     if (slide.button_link_type === 'external' || slide.button_link.startsWith('http')) {
+      const safeUrl = getSafeHttpUrl(slide.button_link);
+      if (!safeUrl) return;
       if (slide.button_open_new_tab) {
-        window.open(slide.button_link, '_blank');
+        window.open(safeUrl, '_blank', 'noopener,noreferrer');
       } else {
-        window.location.href = slide.button_link;
+        window.location.href = safeUrl;
       }
     } else {
-      window.history.pushState(null, '', slide.button_link);
+      const safePath = getSafeInternalPath(slide.button_link);
+      if (!safePath) return;
+      window.history.pushState(null, '', safePath);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
   };
@@ -178,7 +183,6 @@ export const SlidesSection: React.FC = () => {
                 width={1920}
                 height={1080}
                 loading={index === 0 ? 'eager' : 'lazy'}
-                fetchPriority={index === 0 ? 'high' : 'auto'}
               />
 
               {/* Gradient Overlays for perfect legibility */}

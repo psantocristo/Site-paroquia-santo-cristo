@@ -4,7 +4,6 @@ import { supabase } from './supabase';
 interface CloudinaryConfig {
   cloudName: string;
   apiKey: string;
-  apiSecret: string;
   uploadPreset: string;
   enabled: boolean;
   supabaseStorageEnabled: boolean;
@@ -29,7 +28,6 @@ export const getCloudinaryConfig = async (): Promise<CloudinaryConfig> => {
       .in('key', [
         'cloudinary_cloud_name',
         'cloudinary_api_key', 
-        'cloudinary_api_secret',
         'cloudinary_upload_preset',
         'cloudinary_enabled',
         'supabase_storage_enabled'
@@ -45,7 +43,6 @@ export const getCloudinaryConfig = async (): Promise<CloudinaryConfig> => {
     configCache = {
       cloudName: settings.cloudinary_cloud_name || '',
       apiKey: settings.cloudinary_api_key || '',
-      apiSecret: settings.cloudinary_api_secret || '',
       uploadPreset: settings.cloudinary_upload_preset || 'parish_uploads',
       enabled: settings.cloudinary_enabled === 'true',
       supabaseStorageEnabled: settings.supabase_storage_enabled === 'true'
@@ -58,7 +55,6 @@ export const getCloudinaryConfig = async (): Promise<CloudinaryConfig> => {
     return {
       cloudName: '',
       apiKey: '',
-      apiSecret: '',
       uploadPreset: 'parish_uploads',
       enabled: false,
       supabaseStorageEnabled: true

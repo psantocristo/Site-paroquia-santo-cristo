@@ -7,81 +7,81 @@ import toast from 'react-hot-toast';
 import { SEO } from '../components/ui/SEO';
 
 interface AnnouncementViewPageProps {
-  slug: string;
-  onBack: () => void;
+  slug: string;
+  onBack: () => void;
 }
 
 export const AnnouncementViewPage: React.FC<AnnouncementViewPageProps> = ({ slug, onBack }) => {
-  const [announcement, setAnnouncement] = useState<ParishAnnouncement | null>(null);
-  const [loading, setLoading] = useState(true);
-  // NOVO ESTADO: Armazena a URL da imagem para visualização em tela cheia
-  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<ParishAnnouncement | null>(null);
+  const [loading, setLoading] = useState(true);
+  // NOVO ESTADO: Armazena a URL da imagem para visualização em tela cheia
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAnnouncement();
-  }, [slug]);
+  useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('parish_announcements')
+          .select('*')
+          .eq('slug', slug)
+          .eq('is_published', true)
+          .maybeSingle();
 
-  const fetchAnnouncement = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('parish_announcements')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .maybeSingle();
+        if (error) throw error;
 
-      if (error) throw error;
-
-      if (!data) {
-        toast.error('Aviso não encontrado');
-        onBack();
-        return;
+        if (!data) {
+          toast.error('Aviso não encontrado');
+          onBack();
+          return;
+        }
+        // @ts-expect-error - Type mismatch with database types
+        setAnnouncement(data);
+      } catch (error) {
+        console.error('Error fetching announcement:', error);
+        toast.error('Erro ao carregar aviso');
+        onBack();
+      } finally {
+        setLoading(false);
       }
-      // @ts-expect-error - Type mismatch with database types
-      setAnnouncement(data);
-    } catch (error) {
-      console.error('Error fetching announcement:', error);
-      toast.error('Erro ao carregar aviso');
-      onBack();
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const shareAnnouncement = () => {
-    if (!announcement) return;
+    fetchAnnouncement();
+  }, [slug, onBack]);
 
-    const url = `${window.location.origin}/aviso/${announcement.slug}`;
-    const text = `${announcement.title}`;
+  const shareAnnouncement = () => {
+    if (!announcement) return;
 
-    if (navigator.share) {
-      navigator.share({ title: announcement.title, text, url });
-    } else {
-      navigator.clipboard.writeText(url);
-      toast.success('Link copiado!');
-    }
-  };
+    const url = `${window.location.origin}/aviso/${announcement.slug}`;
+    const text = `${announcement.title}`;
 
-  const contactWhatsApp = () => {
-    if (!announcement?.whatsapp_contact) return;
+    if (navigator.share) {
+      navigator.share({ title: announcement.title, text, url });
+    } else {
+      navigator.clipboard.writeText(url);
+      toast.success('Link copiado!');
+    }
+  };
 
-    const phone = announcement.whatsapp_contact.replace(/\D/g, ' ');
-    const message = encodeURIComponent(`Olá! Gostaria de saber mais sobre: ${announcement.title}`);
-    window.open(`https://wa.me/55${phone}?text=${message}`, '_blank');
-  };
+  const contactWhatsApp = () => {
+    if (!announcement?.whatsapp_contact) return;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader className="h-8 w-8 animate-spin text-red-800" />
-      </div>
-    );
-  }
+    const phone = announcement.whatsapp_contact.replace(/\D/g, '');
+    const message = encodeURIComponent(`Olá! Gostaria de saber mais sobre: ${announcement.title}`);
+    window.open(`https://wa.me/55${phone}?text=${message}`, '_blank', 'noopener,noreferrer');
+  };
 
-  if (!announcement) {
-    return null;
-  }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader className="h-8 w-8 animate-spin text-red-800" />
+      </div>
+    );
+  }
+
+  if (!announcement) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 sm:pt-24 pb-12 px-3 sm:px-4">
@@ -152,13 +152,13 @@ export const AnnouncementViewPage: React.FC<AnnouncementViewPageProps> = ({ slug
               {announcement.title}
             </h1>
 
-            <div className="prose prose-lg max-w-none mb-8">
-              {announcement.content.split('\n').map((paragraph, index) => (
-                <p key={index} className="text-gray-700 mb-4 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            <div className="prose prose-lg max-w-none mb-8">
+              {announcement.content.split('\n').map((paragraph, index) => (
+                <p key={index} className="text-gray-700 mb-4 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
               <Button
@@ -182,17 +182,17 @@ export const AnnouncementViewPage: React.FC<AnnouncementViewPageProps> = ({ slug
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t text-sm text-gray-500">
+            <div className="mt-6 pt-6 border-t text-sm text-gray-500">
               {/* @ts-expect-error - created_at is not null here */}
               Publicado em {new Date(announcement.created_at).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-              })}
-            </div>
-          </div>
-        </motion.article>
-      </div>
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </div>
+          </div>
+        </motion.article>
+      </div>
       
       {/* NOVO: Modal de Imagem em Tela Cheia */}
       <AnimatePresence>
@@ -228,6 +228,6 @@ export const AnnouncementViewPage: React.FC<AnnouncementViewPageProps> = ({ slug
         )}
       </AnimatePresence>
       
-    </div>
-  );
+    </div>
+  );
 };

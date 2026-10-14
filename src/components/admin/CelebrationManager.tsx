@@ -172,8 +172,13 @@ export const CelebrationManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold text-gray-800">Gerenciar Celebrações</h3>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-800">Missas e Celebrações</h3>
+          <p className="mt-1 text-sm text-gray-600">
+            Edite aqui os horários exibidos na seção pública de missas e atendimento paroquial.
+          </p>
+        </div>
         <Button onClick={handleCreateCelebration}>
           <Plus className="h-4 w-4" />
           Nova Celebração

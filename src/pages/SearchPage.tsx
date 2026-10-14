@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowLeft, Folder, User, FileText, Megaphone, Heart, Calendar, Loader, X } from 'lucide-react';
+import { Search, ArrowLeft, Folder, User, FileText, Megaphone, Calendar, Loader, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { z } from 'zod';
 import { SEO } from '../components/ui/SEO';
@@ -15,7 +15,7 @@ const searchSchema = z.object({
 
 interface SearchResult {
   id: string;
-  type: 'album' | 'priest' | 'blog' | 'announcement' | 'campaign' | 'program';
+  type: 'album' | 'priest' | 'blog' | 'announcement' | 'program';
   title: string;
   description?: string;
   slug?: string;
@@ -51,6 +51,13 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         return;
       }
 
+      const safeQuery = query.replace(/[^\p{L}\p{N}\s'-]/gu, ' ').replace(/\s+/g, ' ').trim();
+      if (safeQuery.length < 2) {
+        setError('Digite pelo menos 2 caracteres válidos');
+        setResults([]);
+        return;
+      }
+
       setIsSearching(true);
       setError(null);
       const searchResults: SearchResult[] = [];
@@ -59,7 +66,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         .from('photo_albums')
         .select('id, name, description, slug, cover_image_url')
         .eq('is_active', true)
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+        .or(`name.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%`)
         .limit(5);
 
       if (albums) {
@@ -80,7 +87,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         .from('priests_gallery')
         .select('id, name, description, photo_url')
         .eq('is_active', true)
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+        .or(`name.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%`)
         .limit(5);
 
       if (priests) {
@@ -100,7 +107,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         .from('blog_posts')
         .select('id, title, excerpt, slug, featured_image')
         .eq('is_published', true)
-        .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
+        .or(`title.ilike.%${safeQuery}%,excerpt.ilike.%${safeQuery}%,content.ilike.%${safeQuery}%`)
         .limit(5);
 
       if (posts) {
@@ -121,7 +128,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         .from('parish_announcements')
         .select('id, title, content, slug, flyer_url')
         .eq('is_published', true)
-        .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+        .or(`title.ilike.%${safeQuery}%,content.ilike.%${safeQuery}%`)
         .limit(5);
 
       if (announcements) {
@@ -138,32 +145,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
         });
       }
 
-      const { data: campaigns } = await supabase
-        .from('campaigns')
-        .select('id, title, description, slug, featured_image')
-        .eq('is_published', true)
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(5);
-
-      if (campaigns) {
-        campaigns.forEach(campaign => {
-          searchResults.push({
-            id: campaign.id,
-            type: 'campaign',
-            title: campaign.title,
-            description: campaign.description.substring(0, 100) + '...',
-            slug: campaign.slug,
-            url: `/campanha/${campaign.slug}`,
-            image: campaign.featured_image || undefined
-          });
-        });
-      }
-
       const { data: programs } = await supabase
         .from('programs')
         .select('id, title, description, slug')
         .eq('is_active', true)
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+        .or(`title.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%`)
         .limit(5);
 
       if (programs) {
@@ -197,7 +183,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
       case 'priest': return <User className="h-5 w-5 text-purple-600" />;
       case 'blog': return <FileText className="h-5 w-5 text-blue-600" />;
       case 'announcement': return <Megaphone className="h-5 w-5 text-amber-600" />;
-      case 'campaign': return <Heart className="h-5 w-5 text-pink-600" />;
       case 'program': return <Calendar className="h-5 w-5 text-green-600" />;
       default: return <Search className="h-5 w-5 text-gray-600" />;
     }
@@ -209,7 +194,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
       case 'priest': return 'Padre';
       case 'blog': return 'Blog';
       case 'announcement': return 'Aviso';
-      case 'campaign': return 'Campanha';
       case 'program': return 'Programação';
       default: return 'Resultado';
     }
@@ -228,7 +212,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
     <>
       <SEO 
         title="Pesquisar"
-        description="Busque por álbuns, padres, posts do blog, avisos, campanhas e programações"
+        description="Busque por álbuns, padres, posts do blog, avisos e programações"
       />
       
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-amber-50 pt-14 sm:pt-16">
@@ -289,7 +273,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onBack }) => {
                 Digite para começar a buscar
               </h2>
               <p className="text-gray-500">
-                Busque por álbuns, padres, posts, avisos, campanhas e programações
+                Busque por álbuns, padres, posts, avisos e programações
               </p>
             </div>
           )}

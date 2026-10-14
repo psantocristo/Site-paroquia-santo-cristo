@@ -12,6 +12,9 @@ import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { supabase } from './lib/supabase';
 import { trackPageView } from './utils/analytics';
 import { CookieConsent } from './components/ui/CookieConsent';
+import type { Session } from '@supabase/supabase-js';
+import { flushSync } from 'react-dom';
+import { runViewTransition } from './utils/viewTransition';
 
 // Lazy load all non-critical homepage sections
 const HistorySection = React.lazy(() => import('./components/sections/HistorySection').then(m => ({ default: m.HistorySection })));
@@ -41,12 +44,7 @@ const AnnouncementsPage = React.lazy(() => import('./pages/AnnouncementsPage').t
 const AnnouncementViewPage = React.lazy(() => import('./pages/AnnouncementViewPage').then(m => ({ default: m.AnnouncementViewPage })));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const VideoTestimonialsPage = React.lazy(() => import('./pages/VideoTestimonialsPage').then(m => ({ default: m.VideoTestimonialsPage })));
-const CampaignPage = React.lazy(() => import('./pages/CampaignPage').then(m => ({ default: m.CampaignPage })));
-const DonationSuccessPage = React.lazy(() => import('./pages/DonationSuccessPage').then(m => ({ default: m.DonationSuccessPage })));
-const DonationFailurePage = React.lazy(() => import('./pages/DonationFailurePage').then(m => ({ default: m.DonationFailurePage })));
-const DonationThankYouPage = React.lazy(() => import('./pages/DonationThankYouPage').then(m => ({ default: m.DonationThankYouPage })));
 const PriestsGalleryPage = React.lazy(() => import('./pages/PriestsGalleryPage').then(m => ({ default: m.PriestsGalleryPage })));
-const CampaignsListPage = React.lazy(() => import('./pages/CampaignsListPage').then(m => ({ default: m.CampaignsListPage })));
 const DocumentationsPage = React.lazy(() => import('./pages/DocumentationsPage').then(m => ({ default: m.DocumentationsPage })));
 const SearchPage = React.lazy(() => import('./pages/SearchPage').then(m => ({ default: m.SearchPage })));
 const AdminPage = React.lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
@@ -66,11 +64,6 @@ export type AppRoute =
   | { type: 'blog'; slug: string }
   | { type: 'festa-padroeiro' }
   | { type: 'videos' }
-  | { type: 'campaigns' }
-  | { type: 'campaign'; slug: string }
-  | { type: 'donation-success' }
-  | { type: 'donation-failure' }
-  | { type: 'donation-thank-you' }
   | { type: 'priests-gallery' }
   | { type: 'documentacoes' }
   | { type: 'search' }
@@ -95,14 +88,10 @@ function parseCurrentRoute(): AppRoute {
   if (path === '/celebracoes') return { type: 'celebrations' };
   if (path === '/albuns' || path === '/fotos') return { type: 'albums' };
   if (path === '/avisos') return { type: 'announcements' };
-  if (path === '/campanhas') return { type: 'campaigns' };
   if (path === '/documentacoes') return { type: 'documentacoes' };
   if (path === '/galeria-dos-padres' || path === '/galeria-de-padres') return { type: 'priests-gallery' };
   if (path === '/eventos-informativos' || path === '/videos') return { type: 'videos' };
   if (path === '/pesquisar') return { type: 'search' };
-  if (path === '/doacao-sucesso') return { type: 'donation-success' };
-  if (path === '/doacao-falha') return { type: 'donation-failure' };
-  if (path === '/doacao-obrigado') return { type: 'donation-thank-you' };
 
   // Dynamic slug routes
   if (path.startsWith('/blog/')) {
@@ -121,11 +110,6 @@ function parseCurrentRoute(): AppRoute {
     const slug = path.replace('/programacao/', '').split('/')[0];
     return slug ? { type: 'program', slug } : { type: 'not-found' };
   }
-  if (path.startsWith('/campanha/')) {
-    const slug = path.replace('/campanha/', '').split('/')[0];
-    return slug ? { type: 'campaign', slug } : { type: 'not-found' };
-  }
-
   // Hash-based legacy routes
   if (hash.startsWith('#post/')) {
     const slug = hash.replace('#post/', '');
@@ -152,7 +136,12 @@ const SuspensePageLoader = () => (
 );
 
 function App() {
-  const [route, setRoute] = useState<AppRoute>(parseCurrentRoute);
+  const [route, setRouteState] = useState<AppRoute>(parseCurrentRoute);
+  const setRoute = useCallback((nextRoute: AppRoute) => {
+    runViewTransition(() => {
+      flushSync(() => setRouteState(nextRoute));
+    });
+  }, []);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [homeSections, setHomeSections] = useState<{ [key: string]: boolean }>({
     hero: true,
@@ -165,24 +154,38 @@ function App() {
     videos_carousel: true,
     priests_carousel: false,
     programs: true,
+    mass_schedule: true,
     contact: true,
   });
 
   // Check auth session
   useEffect(() => {
+    const updateAdminAccess = async (session: Session | null) => {
+      if (!session) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      const { data: isAdmin, error } = await supabase.rpc('is_admin');
+      const hasAccess = !error && isAdmin === true;
+      setIsAuthenticated(hasAccess);
+
+      if (!hasAccess && window.location.pathname === '/admin') {
+        window.history.replaceState(null, '', '/login');
+        setRoute({ type: 'login' });
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
+      void updateAdminAccess(session);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-      if (!session && route.type === 'admin') {
-        navigateTo('/login');
-      }
+      window.setTimeout(() => void updateAdminAccess(session), 0);
     });
 
     return () => subscription.unsubscribe();
-  }, [route.type]);
+  }, []);
 
   // Load home section settings
   useEffect(() => {
@@ -193,10 +196,10 @@ function App() {
           .select('section_key, is_active');
 
         if (data && data.length > 0) {
-          const map = data.reduce((acc: { [key: string]: boolean }, s: any) => {
+          const map = data.reduce<Record<string, boolean>>((acc, s) => {
             acc[s.section_key] = s.is_active === true;
             return acc;
-          }, {} as { [key: string]: boolean });
+          }, {});
           setHomeSections(map);
         }
       } catch (e) {
@@ -252,13 +255,6 @@ function App() {
       return;
     }
 
-    if (target === 'campanhas') {
-      window.history.pushState(null, '', '/campanhas');
-      setRoute({ type: 'campanhas' });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
     if (target === 'eventos-informativos' || target === 'videos') {
       window.history.pushState(null, '', '/eventos-informativos');
       setRoute({ type: 'videos' });
@@ -308,7 +304,7 @@ function App() {
       return;
     }
 
-    // Path starting with '/' (e.g. '/aviso/meu-slug', '/campanha/slug')
+    // Path starting with '/' (e.g. '/aviso/meu-slug')
     if (target.startsWith('/')) {
       window.history.pushState(null, '', target);
       setRoute(parseCurrentRoute());
@@ -328,6 +324,7 @@ function App() {
         }, 150);
       } else {
         window.history.pushState(null, '', '/#' + target);
+        setRoute({ type: 'home', section: target });
         const el = document.getElementById(target);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }
@@ -348,7 +345,7 @@ function App() {
           <main>
             {homeSections['hero'] && <SlidesSection />}
             {homeSections['jubileu_40anos'] && <HeroSection onNavigate={navigateTo} />}
-            <MassScheduleSection />
+            {homeSections['mass_schedule'] && <MassScheduleSection />}
             {homeSections['announcements'] && <AnnouncementsSection />}
             {homeSections['programs'] && <ProgramsSection />}
             {homeSections['priest'] && <PriestSection />}
@@ -431,19 +428,6 @@ function App() {
           />
         );
 
-      case 'campaigns':
-        return <CampaignsListPage onBack={() => navigateTo('home')} />;
-
-      case 'campaign':
-        return (
-          <CampaignPage
-            slug={route.slug}
-            onBack={() => {
-              window.history.back();
-            }}
-          />
-        );
-
       case 'documentacoes':
         return <DocumentationsPage />;
 
@@ -451,19 +435,10 @@ function App() {
         return <PriestsGalleryPage onBack={() => navigateTo('home')} />;
 
       case 'videos':
-        return <VideoTestimonialsPage onBack={() => navigateTo('home')} onNavigate={navigateTo} />;
+        return <VideoTestimonialsPage onBack={() => navigateTo('home')} />;
 
       case 'search':
         return <SearchPage onBack={() => navigateTo('home')} />;
-
-      case 'donation-success':
-        return <DonationSuccessPage onBack={() => navigateTo('home')} />;
-
-      case 'donation-failure':
-        return <DonationFailurePage onRetry={() => navigateTo('/campanhas')} />;
-
-      case 'donation-thank-you':
-        return <DonationThankYouPage />;
 
       case 'login':
         return (
@@ -501,9 +476,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between">
-      <SEO />
+      <SEO
+        title="Paróquia Senhor Santo Cristo dos Milagres | Cidade Tiradentes"
+        description="Horários de missas, avisos, programações, sacramentos e contatos da Paróquia Senhor Santo Cristo dos Milagres, em Cidade Tiradentes, São Paulo."
+        url="https://paroquiasantocristo.com.br/"
+        keywords="paróquia, igreja católica, Cidade Tiradentes, missas, sacramentos, avisos paroquiais"
+      />
       <Toaster position="top-right" />
-      <UrgentPopup onNavigate={navigateTo} />
+      <UrgentPopup />
       <ScrollToTopButton />
       <WhatsAppButton />
       <CookieConsent />
@@ -513,9 +493,20 @@ function App() {
           renderContent()
         ) : (
           <>
-            <Header onNavigate={navigateTo} />
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only fixed left-4 top-4 z-[10000] rounded-sm bg-white px-4 py-2 text-sm font-semibold text-[#240404] shadow-lg"
+            >
+              Ir para o conteúdo principal
+            </a>
+            <Header
+              onNavigate={navigateTo}
+              activeSection={route.type === 'home' ? (route.section || 'home') : route.type}
+            />
             <AnimatePresence mode="wait">
               <motion.div
+                id="main-content"
+                tabIndex={-1}
                 key={route.type + (('slug' in route && route.slug) ? route.slug : '')}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -529,7 +520,7 @@ function App() {
             <Footer onNavigate={navigateTo} />
             <MobileBottomNav
               onNavigate={navigateTo}
-              onOpenMenu={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onOpenMenu={() => window.dispatchEvent(new CustomEvent('open-site-menu'))}
               activeSection={route.type === 'home' ? 'home' : (route.type as string)}
             />
           </>

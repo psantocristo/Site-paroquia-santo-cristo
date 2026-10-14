@@ -15,3 +15,4 @@ SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 BASE_URL = "https://paroquiasantocristo.com.br"
 VITE_SUPABASE_URL = "https://esbkvwfogqgcttgzsyqr.supabase.co"
 VITE_SUPABASE_PROJECT_ID = "esbkvwfogqgcttgzsyqr"
+VITE_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzYmt2d2ZvZ3FnY3R0Z3pzeXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMTY4MDgsImV4cCI6MjEwMjY5MjgwOH0.HdXZK30MI9sihapoj9GIMYraXYbbFXl_BAHa9Viz5jY"

@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Church, MapPin, Phone, Mail, Clock, Heart, Lock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Lock } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import parishLogo from '../../assets/logo-paroquia.png';
 
 interface FooterProps {
   onNavigate: (section: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState(parishLogo);
   const [logoAlt, setLogoAlt] = useState('Logo da Paróquia');
   const [parishInfo, setParishInfo] = useState<{
-    phone?: string;
-    whatsapp_phone?: string;
-    email?: string;
-    address?: string;
-    office_hours?: string;
-    confession_hours?: string;
+    phone?: string | null;
+    whatsapp_phone?: string | null;
+    email?: string | null;
+    address?: string | null;
+    office_hours?: string | null;
+    confession_hours?: string | null;
   }>({});
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           .eq('key', 'logo_settings')
           .maybeSingle();
         if (logoData) {
-          setLogoUrl(logoData.logo_url);
+          setLogoUrl(logoData.logo_url || parishLogo);
           setLogoAlt(logoData.logo_alt || 'Logo da Paróquia');
         }
 
@@ -50,18 +51,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* MOBILE FOOTER: Compact, Clean & Essential (Visible only on <md) */}
         <div className="md:hidden space-y-6 pb-8 border-b border-white/10 text-center">
           <div className="flex flex-col items-center gap-3">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={logoAlt}
-                className="h-12 w-auto object-contain max-w-[220px]"
-                loading="lazy"
-              />
-            ) : (
-              <div className="p-2 bg-gradient-to-br from-[#e8c872]/20 to-[#c9a84c]/10 rounded-xl border border-[#c5a059]/40">
-                <Church className="h-7 w-7 text-[#e8c872]" />
-              </div>
-            )}
+            <img
+              src={logoUrl}
+              alt={logoAlt}
+              className="h-12 w-auto object-contain max-w-[220px]"
+              loading="lazy"
+              onError={(event) => { event.currentTarget.src = parishLogo; }}
+            />
             <div>
               <h2 className="text-white font-serif font-bold text-lg">Paróquia Senhor Santo Cristo</h2>
               <p className="text-[#e8c872] text-xs font-sans tracking-wide">Cidade Tiradentes • São Paulo - SP</p>
@@ -90,23 +86,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* DESKTOP FOOTER: Full 4 Columns (Visible only on md+) */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12 border-b border-white/10">
+        {/* DESKTOP FOOTER */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-8 pb-12 border-b border-white/10">
           {/* Column 1: Parish Identity */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt={logoAlt}
-                  className="h-12 w-auto object-contain max-w-[200px]"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="p-2 bg-gradient-to-br from-[#e8c872]/20 to-[#c9a84c]/10 rounded-xl border border-[#c5a059]/30">
-                  <Church className="h-8 w-8 text-[#e8c872]" />
-                </div>
-              )}
+              <img
+                src={logoUrl}
+                alt={logoAlt}
+                className="h-12 w-auto object-contain max-w-[200px]"
+                loading="lazy"
+                onError={(event) => { event.currentTarget.src = parishLogo; }}
+              />
             </div>
             <p className="text-sm text-stone-300 leading-relaxed font-light">
               Paróquia Senhor Santo Cristo dos Milagres. Evangelização, comunhão e acolhimento pastoral em Cidade Tiradentes.
@@ -169,34 +160,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Column 4: Donations & Admin */}
-          <div className="space-y-3">
-            <h3 className="text-white font-serif font-bold text-lg tracking-wide text-[#e8c872] border-b border-[#c5a059]/20 pb-2">
-              Contribuição
-            </h3>
-            <p className="text-xs text-stone-300 leading-relaxed">
-              Ajude a manter nossas obras sociais e atividades pastorais através do dízimo ou doações online.
-            </p>
-            <button
-              onClick={() => {
-                window.location.pathname = '/campanhas';
-              }}
-              className="w-full py-2.5 px-4 bg-gradient-to-r from-[#e8c872] to-[#c9a84c] hover:from-[#f3db92] hover:to-[#c9a84c] text-[#240404] font-bold rounded-xl shadow-md text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer border border-[#f5ecd0]/50"
-            >
-              <Heart className="h-4 w-4 fill-[#240404]" />
-              Doar via PIX / Cartão
-            </button>
-            <div className="pt-2">
-              <button
-                onClick={() => onNavigate('admin')}
-                className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-[#e8c872] transition-colors cursor-pointer"
-                title="Área Administrativa"
-              >
-                <Lock className="h-3 w-3" />
-                <span>Acesso Administrativo</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Bar */}

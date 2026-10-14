@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { supabase, BlogPost } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import { SEO } from '../components/ui/SEO';
+import DOMPurify from 'dompurify';
 
 interface BlogPostPageProps {
   slug: string;
@@ -159,7 +160,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug, onBack }) => {
 
             <div
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
             />
           </div>
         </motion.article>

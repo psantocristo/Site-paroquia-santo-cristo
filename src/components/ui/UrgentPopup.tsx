@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
 import { Button } from './Button';
 import { supabase, UrgentPopup as UrgentPopupType } from '../../lib/supabase';
+import { getSafeHttpUrl } from '../../utils/safeUrl';
 
 export const UrgentPopup: React.FC = () => {
   const [popup, setPopup] = useState<UrgentPopupType | null>(null);
@@ -71,8 +72,9 @@ export const UrgentPopup: React.FC = () => {
   const handleAutoClose = () => handleClose(false);
 
   const handleLinkClick = () => {
-    if (popup?.link_url) {
-      window.open(popup.link_url, '_blank', 'noopener,noreferrer');
+    const safeUrl = getSafeHttpUrl(popup?.link_url);
+    if (safeUrl) {
+      window.open(safeUrl, '_blank', 'noopener,noreferrer');
     }
     handleClose(false);
   };

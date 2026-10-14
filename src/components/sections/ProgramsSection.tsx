@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ChevronRight, Bookmark, ArrowRight } from 'lucide-react';
+import { Clock, ChevronRight, Bookmark } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface Program {
@@ -38,7 +38,7 @@ export const ProgramsSection: React.FC = () => {
         .select('id, title, slug, description, time, days_of_week, featured_image')
         .eq('is_active', true)
         .order('order_index', { ascending: true })
-        .limit(8);
+        .limit(4);
 
       if (data) setPrograms(data as unknown as Program[]);
     } catch (error) {
@@ -78,12 +78,12 @@ export const ProgramsSection: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-wider mb-2.5">
+            <div className="institutional-kicker">
               <Bookmark className="h-3.5 w-3.5 text-[#c5a059]" />
-              <span>Pastorais & Grupos</span>
+              <span>Agenda pastoral</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight">
-              Programações & Encontros
+            <h2 className="institutional-title">
+              Programações e encontros
             </h2>
           </div>
 
@@ -106,11 +106,16 @@ export const ProgramsSection: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: index * 0.04 }}
               onClick={() => handleNavigateToProgram(program.slug)}
-              className="group bg-white rounded-2xl p-5 border border-stone-200/80 hover:border-[#c5a059] shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer"
+              role="link"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') handleNavigateToProgram(program.slug);
+              }}
+              className="institutional-card group p-4 flex flex-col justify-between cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8f6d25]"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#240404]/10 text-[#240404] text-xs font-bold font-sans">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-stone-100 text-[#240404] text-xs font-bold font-sans border border-stone-200">
                     <Clock className="h-3.5 w-3.5 text-[#c5a059]" />
                     {program.time}
                   </span>
@@ -131,7 +136,7 @@ export const ProgramsSection: React.FC = () => {
                   {program.title}
                 </h3>
 
-                <p className="text-stone-600 text-xs sm:text-sm line-clamp-2 leading-relaxed font-light mb-3">
+                <p className="text-stone-600 text-xs sm:text-sm line-clamp-2 leading-relaxed font-light mb-2">
                   {program.description ? program.description.replace(/<[^>]*>/g, '') : ''}
                 </p>
               </div>

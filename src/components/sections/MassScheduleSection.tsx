@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Church, Clock, Calendar, ShieldCheck, MessageCircle, MapPin, HeartHandshake, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Church, Clock, Calendar, ShieldCheck, MessageCircle, MapPin, HeartHandshake, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase, Celebration } from '../../lib/supabase';
 
 export const MassScheduleSection: React.FC = () => {
   const [celebrations, setCelebrations] = useState<Celebration[]>([]);
   const [activeTab, setActiveTab] = useState<'domingo' | 'semana' | 'confissoes'>('domingo');
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<string>('todos');
+  const [showAllSunday, setShowAllSunday] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,27 +36,36 @@ export const MassScheduleSection: React.FC = () => {
     ? sundayCelebrations
     : sundayCelebrations.filter(c => c.time === selectedTimeFilter);
 
+  const shouldCollapseSunday = selectedTimeFilter === 'todos' && filteredSunday.length > 4;
+  const visibleSunday = shouldCollapseSunday && !showAllSunday
+    ? filteredSunday.slice(0, 4)
+    : filteredSunday;
+
+  if (isLoading) {
+    return (
+      <section id="horarios-missas" className="py-12 bg-[#faf7f2] border-y border-[#c5a059]/20">
+        <div className="max-w-7xl mx-auto px-4" aria-label="Carregando horários">
+          <div className="h-8 w-64 max-w-full mx-auto rounded-lg bg-stone-200 animate-pulse" />
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[0, 1, 2, 3].map(item => <div key={item} className="h-28 rounded-2xl bg-white border border-stone-200 animate-pulse" />)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="horarios-missas" className="py-10 md:py-16 bg-[#faf7f2] border-y border-[#c5a059]/25 relative overflow-hidden">
-      {/* Decorative subtle background elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#c5a059]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#3b0808]/5 rounded-full blur-3xl pointer-events-none" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-widest mb-3">
+          <div className="institutional-kicker">
             <Clock className="h-3.5 w-3.5 text-[#c5a059]" />
-            <span>Vida Comunitária & Sacramentos</span>
+            <span>Celebrações e sacramentos</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight mb-3">
-            Horários de Missas & Atendimento
+          <h2 className="institutional-title mb-3">
+            Missas e atendimento paroquial
           </h2>
-          <div className="flex items-center justify-center gap-3 my-2">
-            <div className="h-px w-12 bg-[#c5a059]/40" />
-            <span className="text-[#c5a059] text-xs">✦</span>
-            <div className="h-px w-12 bg-[#c5a059]/40" />
-          </div>
           <p className="text-stone-600 text-sm sm:text-base font-light">
             Participe da Santa Missa, encontros de oração e atendimento sacramental na Igreja Matriz e nas Comunidades.
           </p>
@@ -63,13 +73,13 @@ export const MassScheduleSection: React.FC = () => {
 
         {/* Navigation Tabs */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1.5 bg-stone-200/70 backdrop-blur-sm rounded-2xl border border-[#c5a059]/30 shadow-inner max-w-full overflow-x-auto">
+          <div className="inline-flex p-1 bg-stone-100 rounded-md border border-stone-300 max-w-full overflow-x-auto">
             <button
               onClick={() => setActiveTab('domingo')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-sm font-medium text-xs sm:text-sm transition-colors duration-150 cursor-pointer ${
                 activeTab === 'domingo'
-                  ? 'bg-[#240404] text-[#e8c872] shadow-md'
-                  : 'text-stone-700 hover:text-[#240404] hover:bg-white/40'
+                  ? 'bg-[#240404] text-white'
+                  : 'text-stone-700 hover:text-[#240404] hover:bg-white'
               }`}
             >
               <Church className="h-4 w-4" />
@@ -78,10 +88,10 @@ export const MassScheduleSection: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('semana')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-sm font-medium text-xs sm:text-sm transition-colors duration-150 cursor-pointer ${
                 activeTab === 'semana'
-                  ? 'bg-[#240404] text-[#e8c872] shadow-md'
-                  : 'text-stone-700 hover:text-[#240404] hover:bg-white/40'
+                  ? 'bg-[#240404] text-white'
+                  : 'text-stone-700 hover:text-[#240404] hover:bg-white'
               }`}
             >
               <Calendar className="h-4 w-4" />
@@ -90,14 +100,14 @@ export const MassScheduleSection: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('confissoes')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-sm font-medium text-xs sm:text-sm transition-colors duration-150 cursor-pointer ${
                 activeTab === 'confissoes'
-                  ? 'bg-[#240404] text-[#e8c872] shadow-md'
-                  : 'text-stone-700 hover:text-[#240404] hover:bg-white/40'
+                  ? 'bg-[#240404] text-white'
+                  : 'text-stone-700 hover:text-[#240404] hover:bg-white'
               }`}
             >
               <HeartHandshake className="h-4 w-4" />
-              <span>Confissões & Atendimento</span>
+              <span>Confissões e atendimento</span>
             </button>
           </div>
         </div>
@@ -115,7 +125,10 @@ export const MassScheduleSection: React.FC = () => {
             <div className="flex flex-wrap items-center justify-center gap-2">
               <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider mr-1">Filtrar horário:</span>
               <button
-                onClick={() => setSelectedTimeFilter('todos')}
+                onClick={() => {
+                  setSelectedTimeFilter('todos');
+                  setShowAllSunday(false);
+                }}
                 className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
                   selectedTimeFilter === 'todos'
                     ? 'bg-[#240404] text-white border border-[#240404]'
@@ -127,7 +140,10 @@ export const MassScheduleSection: React.FC = () => {
               {times.map(t => (
                 <button
                   key={t}
-                  onClick={() => setSelectedTimeFilter(t)}
+                  onClick={() => {
+                    setSelectedTimeFilter(t);
+                    setShowAllSunday(false);
+                  }}
                   className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
                     selectedTimeFilter === t
                       ? 'bg-[#240404] text-white border border-[#240404]'
@@ -140,8 +156,8 @@ export const MassScheduleSection: React.FC = () => {
             </div>
 
             {/* Sunday Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredSunday.map((item, idx) => {
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ${showAllSunday ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+              {visibleSunday.map((item, idx) => {
                 const isMatriz = item.community_name.toLowerCase().includes('matriz');
                 const isMissa = item.celebration_type.toLowerCase() === 'missa';
 
@@ -151,7 +167,7 @@ export const MassScheduleSection: React.FC = () => {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.04 }}
-                    className={`rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between ${
+                    className={`rounded-lg p-4 border transition-colors duration-150 flex flex-col justify-between ${
                       isMatriz
                         ? 'bg-gradient-to-br from-[#2b0606] to-[#1c0303] text-white border-[#c5a059]/50 shadow-md ring-1 ring-[#c5a059]/20'
                         : 'bg-white text-stone-900 border-stone-200/80 hover:border-[#c5a059]/60 shadow-sm hover:shadow-md'
@@ -200,6 +216,29 @@ export const MassScheduleSection: React.FC = () => {
                 );
               })}
             </div>
+
+            {shouldCollapseSunday && (
+              <div className="flex justify-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAllSunday(current => !current)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-[#240404] shadow-sm transition-colors hover:border-[#c5a059] hover:bg-stone-50"
+                  aria-expanded={showAllSunday}
+                >
+                  {showAllSunday ? (
+                    <>
+                      <span>Mostrar menos horários</span>
+                      <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Ver todos os {filteredSunday.length} horários de domingo</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -212,7 +251,7 @@ export const MassScheduleSection: React.FC = () => {
             transition={{ duration: 0.25 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-5"
           >
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-sm space-y-3">
+            <div className="institutional-card p-6 space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs font-bold">
                 <Calendar className="h-3.5 w-3.5 text-amber-700" />
                 Terça a Sexta-feira
@@ -227,9 +266,9 @@ export const MassScheduleSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-sm space-y-3">
+            <div className="institutional-card p-6 space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs font-bold">
-                <Sparkles className="h-3.5 w-3.5 text-amber-700" />
+                <Calendar className="h-3.5 w-3.5 text-amber-700" />
                 1ª Sexta-feira do Mês
               </div>
               <h3 className="font-serif font-bold text-xl text-[#240404]">Sagrado Coração de Jesus</h3>
@@ -242,7 +281,7 @@ export const MassScheduleSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-stone-200/80 shadow-sm space-y-3">
+            <div className="institutional-card p-6 space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs font-bold">
                 <Calendar className="h-3.5 w-3.5 text-amber-700" />
                 Sábado
@@ -269,7 +308,7 @@ export const MassScheduleSection: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {/* Confissões Card */}
-            <div className="bg-gradient-to-br from-[#240404] to-[#360808] text-white rounded-2xl p-6 sm:p-8 border border-[#c5a059]/40 shadow-lg relative overflow-hidden">
+            <div className="bg-[#240404] text-white rounded-lg p-6 sm:p-8 border border-[#c5a059]/40 relative overflow-hidden">
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8c872]/20 border border-[#e8c872]/40 rounded-lg text-[#e8c872] text-xs font-bold uppercase tracking-wider">
                   <ShieldCheck className="h-4 w-4" />
@@ -303,7 +342,7 @@ export const MassScheduleSection: React.FC = () => {
             </div>
 
             {/* Secretaria & Direção Espiritual Card */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200/80 shadow-md space-y-4 flex flex-col justify-between">
+            <div className="institutional-card p-6 sm:p-8 space-y-4 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#240404]/10 border border-[#240404]/20 rounded-lg text-[#240404] text-xs font-bold uppercase tracking-wider">
                   <MessageCircle className="h-4 w-4 text-[#c5a059]" />

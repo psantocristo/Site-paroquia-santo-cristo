@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, ChevronRight, Tag, Bell, ArrowRight, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calendar, ChevronRight, Bell, ArrowRight } from 'lucide-react';
 import { supabase, ParishAnnouncement } from '../../lib/supabase';
 
 export const AnnouncementsSection: React.FC = () => {
@@ -17,12 +17,17 @@ export const AnnouncementsSection: React.FC = () => {
         .from('parish_announcements')
         .select('*')
         .eq('is_published', true)
-        .order('priority_order', { ascending: true })
+        .order('event_date', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
-        .limit(6);
+        .limit(3);
 
       if (error) throw error;
-      if (data) setAnnouncements(data);
+      if (data) {
+        setAnnouncements(data.map(item => ({
+          ...item,
+          type: item.type === 'event' ? 'event' : 'announcement'
+        })));
+      }
     } catch (error) {
       console.error('Error fetching announcements:', error);
     } finally {
@@ -71,11 +76,11 @@ export const AnnouncementsSection: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#240404]/5 border border-[#c5a059]/30 rounded-full text-[#240404] text-xs font-semibold uppercase tracking-wider mb-2.5">
+            <div className="institutional-kicker">
               <Bell className="h-3.5 w-3.5 text-[#c5a059]" />
               <span>Avisos & Comunicados</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#240404] tracking-tight">
+            <h2 className="institutional-title">
               Avisos Paroquiais
             </h2>
           </div>
@@ -93,6 +98,7 @@ export const AnnouncementsSection: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {announcements.map((announcement, index) => {
             const hasImage = !!announcement.flyer_url;
+            const categoryLabel = announcement.type === 'event' ? 'Evento' : 'Aviso';
             return (
               <motion.article
                 key={announcement.id}
@@ -101,7 +107,12 @@ export const AnnouncementsSection: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 onClick={() => navigateToAnnouncement(announcement)}
-                className="group bg-[#faf7f2] rounded-2xl border border-stone-200/80 hover:border-[#c5a059] shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') navigateToAnnouncement(announcement);
+                }}
+                role="link"
+                tabIndex={0}
+                className="institutional-card group overflow-hidden flex flex-col justify-between cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8f6d25]"
               >
                 <div>
                   {hasImage ? (
@@ -109,32 +120,32 @@ export const AnnouncementsSection: React.FC = () => {
                       <img
                         src={announcement.flyer_url!}
                         alt={announcement.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover"
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       
                       {/* Category badge over image */}
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-[#240404]/80 backdrop-blur-md text-[#e8c872] text-[11px] font-bold tracking-wide uppercase border border-[#c5a059]/40">
-                        {announcement.category || 'Aviso'}
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-sm bg-[#240404] text-[#e8c872] text-[11px] font-bold tracking-wide uppercase border border-[#c5a059]/40">
+                        {categoryLabel}
                       </span>
 
-                      {announcement.start_date && (
+                      {announcement.event_date && (
                         <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-[#240404] text-[11px] font-bold flex items-center gap-1 shadow">
                           <Calendar className="h-3 w-3 text-[#c5a059]" />
-                          {formatDate(announcement.start_date)}
+                          {formatDate(announcement.event_date)}
                         </span>
                       )}
                     </div>
                   ) : (
-                    <div className="p-4 bg-gradient-to-r from-[#240404] to-[#3a0808] text-white flex items-center justify-between">
+                    <div className="p-4 bg-[#240404] text-white flex items-center justify-between">
                       <span className="px-2.5 py-0.5 rounded-md bg-white/10 text-[#e8c872] text-xs font-semibold uppercase">
-                        {announcement.category || 'Comunicado'}
+                        {categoryLabel}
                       </span>
-                      {announcement.start_date && (
+                      {announcement.event_date && (
                         <span className="text-xs text-stone-300 flex items-center gap-1">
                           <Calendar className="h-3 w-3 text-[#e8c872]" />
-                          {formatDate(announcement.start_date)}
+                          {formatDate(announcement.event_date)}
                         </span>
                       )}
                     </div>

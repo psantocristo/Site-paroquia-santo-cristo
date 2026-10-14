@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LogIn, Church, ArrowLeft, Mail, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -33,10 +32,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onBack }) 
         throw error;
       }
 
+      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+      if (adminError || !isAdmin) {
+        await supabase.auth.signOut();
+        throw new Error('Esta conta não possui autorização administrativa.');
+      }
+
       toast.success('Login realizado com sucesso! Bem-vindo(a).');
       onLoginSuccess();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao fazer login no painel.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao fazer login no painel.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

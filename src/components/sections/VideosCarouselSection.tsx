@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Play, ChevronRight, ChevronLeft, Video, Sparkles, ExternalLink } from 'lucide-react';
+import { Play, ChevronRight, ChevronLeft, Video } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import toast from 'react-hot-toast';
 
 interface VideoTestimonial {
   id: string;
@@ -39,7 +38,13 @@ export const VideosCarouselSection: React.FC<VideosCarouselSectionProps> = ({ on
         .limit(8);
 
       if (error) throw error;
-      setVideos(data || []);
+      setVideos((data || []).map(video => ({
+        ...video,
+        description: video.description || null,
+        video_type: video.video_type === 'youtube' ? 'youtube' : 'upload',
+        is_active: video.is_active === true,
+        order_index: video.order_index || 0,
+      })));
     } catch (error) {
       console.error('Error fetching videos:', error);
     } finally {

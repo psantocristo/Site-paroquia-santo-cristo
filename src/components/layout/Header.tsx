@@ -1,20 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Church, Search, Heart } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import parishLogo from '../../assets/logo-paroquia.png';
 
 interface HeaderProps {
   onNavigate: (section: string) => void;
+  activeSection?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
+export const Header: React.FC<HeaderProps> = ({ onNavigate, activeSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState(parishLogo);
   const [logoAlt, setLogoAlt] = useState('Logo da Paróquia');
 
   useEffect(() => {
     fetchLogo();
   }, []);
+
+  useEffect(() => {
+    const openMenu = () => setIsMenuOpen(true);
+    window.addEventListener('open-site-menu', openMenu);
+    return () => window.removeEventListener('open-site-menu', openMenu);
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [isMenuOpen]);
 
   const fetchLogo = async () => {
     try {
@@ -27,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
-        setLogoUrl(data.logo_url);
+        setLogoUrl(data.logo_url || parishLogo);
         setLogoAlt(data.logo_alt || 'Logo da Paróquia');
       }
     } catch (error) {
@@ -38,7 +55,9 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   const desktopMenuItems = [
     { id: 'home', label: 'Início' },
     { id: 'announcements', label: 'Avisos' },
-    { id: 'programs', label: 'Programações' }
+    { id: 'programs', label: 'Programações' },
+    { id: 'documentacoes', label: 'Sacramentos' },
+    { id: 'contact', label: 'Contato' }
   ];
 
   const allMenuItems = [
@@ -94,48 +113,42 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#240404] border-b border-[#c5a059]/40 shadow-2xl safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#240404] border-b border-[#c5a059]/35 shadow-lg safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 w-full">
           {/* Logo / Brand */}
-          <motion.div
-            className="flex items-center gap-2 sm:gap-3 cursor-pointer py-2"
+          <button
+            type="button"
+            className="flex min-w-0 items-center gap-2 sm:gap-3 cursor-pointer py-2"
             onClick={() => handleNavigate('home')}
-            whileHover={{ scale: 1.02 }}
+            aria-label="Ir para o início"
           >
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={logoAlt}
-                className="h-10 sm:h-14 w-auto object-contain max-w-[180px] sm:max-w-[280px]"
-              />
-            ) : (
-              <>
-                <div className="p-2 bg-gradient-to-br from-[#e8c872]/20 to-[#c9a84c]/10 rounded-xl border border-[#c5a059]/40 shadow-inner">
-                  <Church className="h-6 w-6 sm:h-8 sm:w-8 text-[#e8c872]" />
-                </div>
-                <div>
-                  <h1 className="text-white font-serif font-bold text-base sm:text-xl tracking-tight leading-tight">
-                    Paróquia Senhor Santo Cristo
-                  </h1>
-                  <p className="text-[#e8c872]/90 text-[10px] sm:text-xs tracking-[0.25em] uppercase font-sans font-medium">
-                    Diocese de São Miguel Paulista
-                  </p>
-                </div>
-              </>
-            )}
-          </motion.div>
+            <img
+              src={logoUrl}
+              alt={logoAlt}
+              className="h-10 w-auto max-w-[145px] object-contain sm:h-14 sm:max-w-[280px]"
+              onError={(event) => {
+                if (event.currentTarget.src !== parishLogo) {
+                  event.currentTarget.src = parishLogo;
+                }
+              }}
+            />
+          </button>
 
           {/* Desktop Navigation Links (Início, Avisos, Programações) */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-4">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Navegação principal">
             {desktopMenuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="px-3.5 py-2 text-sm text-stone-100 hover:text-[#e8c872] font-semibold tracking-wide transition-all duration-150 rounded-lg hover:bg-white/10 relative group cursor-pointer"
+                className={`px-3 py-2 text-sm font-medium tracking-wide transition-colors duration-150 border-b-2 cursor-pointer ${
+                  activeSection === item.id
+                    ? 'border-[#e8c872] text-[#e8c872]'
+                    : 'border-transparent text-stone-100 hover:border-white/30 hover:text-white'
+                }`}
+                aria-current={activeSection === item.id ? 'page' : undefined}
               >
                 {item.label}
-                <span className="absolute bottom-1 left-3.5 right-3.5 h-0.5 bg-[#e8c872] scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-center rounded-full" />
               </button>
             ))}
           </nav>
@@ -143,10 +156,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Search Button */}
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-stone-100 hover:text-[#e8c872] p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-[#c5a059]/40 transition-all cursor-pointer"
+            <button
+              className="text-stone-100 hover:text-white p-2.5 rounded-md hover:bg-white/10 border border-transparent hover:border-white/20 transition-colors cursor-pointer"
               onClick={() => {
                 window.location.pathname = '/pesquisar';
               }}
@@ -155,25 +166,17 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               title="Pesquisar"
             >
               <Search size={20} />
-            </motion.button>
-
-            {/* Direct Oferta CTA */}
-            <button
-              onClick={() => {
-                window.location.pathname = '/campanhas';
-              }}
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-b from-[#e8c872] via-[#c9a84c] to-[#b58f34] hover:from-[#f3db92] hover:to-[#c9a84c] text-[#240404] font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#f5ecd0]/60 active:scale-95"
-            >
-              <Heart className="h-4 w-4 fill-[#240404]" />
-              <span>Oferta</span>
             </button>
 
             {/* Hamburger Menu Button (Available for desktop and mobile to access all other pages) */}
             <button
-              className="text-white hover:text-[#e8c872] p-2.5 rounded-xl hover:bg-white/10 border border-transparent hover:border-[#c5a059]/40 transition-all cursor-pointer flex items-center justify-center"
+              id="site-menu-button"
+              className="text-white p-2.5 rounded-md hover:bg-white/10 border border-transparent hover:border-white/20 transition-colors cursor-pointer flex items-center justify-center"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               style={{ touchAction: 'manipulation' }}
               aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu com todas as páginas'}
+              aria-expanded={isMenuOpen}
+              aria-controls="site-menu-panel"
               title="Menu completo"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -185,21 +188,21 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.nav
+              id="site-menu-panel"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full overflow-hidden shadow-2xl"
+              className="py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain shadow-2xl"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 px-2">
                 {allMenuItems.map((item) => (
-                  <motion.div
+                  <div
                     key={item.id}
                     className="w-full"
-                    whileHover={{ x: 6 }}
                   >
                     <button
                       onClick={(e) => handleMobileNavigate(e, item.id)}
-                      className="block w-full text-left px-4 py-3 font-medium transition-colors duration-150 rounded-xl touch-manipulation text-stone-100 hover:text-[#e8c872] hover:bg-white/10 text-sm sm:text-base border-b border-white/5"
+                      className="block w-full text-left px-4 py-3 font-medium transition-colors duration-150 rounded-md touch-manipulation text-stone-100 hover:text-white hover:bg-white/10 text-sm sm:text-base border-b border-white/5"
                       style={{ 
                         touchAction: 'manipulation',
                         WebkitTapHighlightColor: 'transparent',
@@ -208,19 +211,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     >
                       {item.label}
                     </button>
-                  </motion.div>
+                  </div>
                 ))}
-              </div>
-              <div className="p-3 mt-2 border-t border-white/10">
-                <button
-                  onClick={() => {
-                    window.location.pathname = '/campanhas';
-                  }}
-                  className="w-full py-3 bg-gradient-to-r from-[#e8c872] to-[#c9a84c] text-[#240404] font-bold text-center rounded-xl shadow-md text-sm flex items-center justify-center gap-2"
-                >
-                  <Heart className="h-4 w-4 fill-[#240404]" />
-                  <span>Fazer uma Oferta / Dízimo Paroquial</span>
-                </button>
               </div>
             </motion.nav>
           )}
