@@ -26,12 +26,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Navegação inferior móvel"
-      className="lg:hidden fixed bottom-0 left-0 right-0 w-full z-[9999] bg-[#200303] border-t border-[#c5a059]/40 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]"
+      className="fixed bottom-0 left-0 right-0 z-50 w-full border-t border-[#c5a059]/40 bg-[#200303] shadow-none lg:hidden"
       style={{
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
-        willChange: 'transform',
-        contain: 'layout paint',
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
       }}
     >

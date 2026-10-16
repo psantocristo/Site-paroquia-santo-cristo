@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Share2, X, Facebook, Play } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { PriestDetailsDialog } from '../components/ui/PriestDetailsDialog';
 import { SEO } from '../components/ui/SEO';
 import { supabase } from '../integrations/supabase/client';
 import toast from 'react-hot-toast';
@@ -59,13 +60,13 @@ export const PriestsGalleryPage: React.FC<PriestsGalleryPageProps> = ({ onBack }
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('priests_gallery' as any)
+        .from('priests_gallery')
         .select('*')
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 
       if (error) throw error;
-      setPriests((data || []) as any);
+      setPriests(data || []);
     } catch (error) {
       console.error('Error fetching priests:', error);
       toast.error('Erro ao carregar galeria');
@@ -124,9 +125,8 @@ export const PriestsGalleryPage: React.FC<PriestsGalleryPageProps> = ({ onBack }
         url="https://paroquiasantocristo.com.br/galeria-dos-padres"
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        {/* Header with Gradient */}
-        <header className="bg-gradient-to-r from-red-800 to-red-900 text-white py-6 sticky top-0 z-40 shadow-lg">
+      <div className="min-h-dvh bg-stone-50">
+        <header className="sticky top-0 z-40 border-b border-[#c5a059]/35 bg-[#240404] py-4 text-white shadow-none md:py-6 md:shadow-sm">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
               <Button
@@ -367,73 +367,16 @@ export const PriestsGalleryPage: React.FC<PriestsGalleryPageProps> = ({ onBack }
           )}
         </div>
 
-        {/* Biography Modal */}
-        <AnimatePresence>
-          {selectedPriest && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"
-              onClick={() => setSelectedPriest(null)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Modal Header */}
-                <div className="sticky top-0 bg-gradient-to-r from-red-800 to-red-900 text-white p-6 rounded-t-2xl">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-1">{selectedPriest.name}</h3>
-                      {selectedPriest.was_parish_priest && selectedPriest.date_at_parish && (
-                        <p className="text-red-200">Foi Pároco - {selectedPriest.date_at_parish}</p>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => setSelectedPriest(null)}
-                      className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
-                    >
-                      <X className="h-6 w-6" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Modal Body */}
-                <div className="p-6">
-                  {selectedPriest.photo_url && (
-                    <div className="flex justify-center mb-6">
-                      <img
-                        src={selectedPriest.photo_url}
-                        alt={selectedPriest.name}
-                        className="w-48 h-48 rounded-full object-cover shadow-lg ring-4 ring-red-100"
-                      />
-                    </div>
-                  )}
-
-                  <div className="prose prose-lg max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                      {selectedPriest.description}
-                    </p>
-                  </div>
-
-                  {selectedPriest.video_url && (
-                    <div className="mt-6">
-                      <video
-                        src={selectedPriest.video_url}
-                        controls
-                        className="w-full rounded-lg shadow-lg"
-                      />
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <PriestDetailsDialog
+          open={Boolean(selectedPriest)}
+          name={selectedPriest?.name || ''}
+          title={selectedPriest?.was_parish_priest ? 'Pároco da comunidade' : 'Clero paroquial'}
+          photoUrl={selectedPriest?.photo_url}
+          description={selectedPriest?.description}
+          metadata={selectedPriest?.date_at_parish ? [`Período na paróquia: ${selectedPriest.date_at_parish}`] : []}
+          videoUrl={selectedPriest?.video_url}
+          onClose={() => setSelectedPriest(null)}
+        />
       </div>
     </>
   );

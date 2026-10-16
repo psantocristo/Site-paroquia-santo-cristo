@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, activeSection }) => 
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#240404] border-b border-[#c5a059]/35 shadow-lg safe-area-inset-top will-change-transform w-full max-w-full overflow-hidden">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full max-w-full overflow-hidden border-b border-[#c5a059]/35 bg-[#240404] shadow-none safe-area-inset-top lg:shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 w-full">
           {/* Logo / Brand */}
@@ -189,10 +189,11 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, activeSection }) => 
           {isMenuOpen && (
             <motion.nav
               id="site-menu-panel"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="py-4 border-t border-[#c5a059]/30 bg-[#240404] w-full max-w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain shadow-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+              className="max-h-[calc(100dvh-4rem)] w-full max-w-full overflow-y-auto overscroll-contain border-t border-[#c5a059]/30 bg-[#240404] py-4 shadow-none"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 px-2">
                 {allMenuItems.map((item) => (

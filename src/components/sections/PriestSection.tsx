@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Church } from 'lucide-react';
+import { ChevronRight, Church } from 'lucide-react';
 import { supabase, Priest } from '../../lib/supabase';
+import { PriestDetailsDialog } from '../ui/PriestDetailsDialog';
 
 export const PriestSection: React.FC = () => {
   const [priests, setPriests] = useState<Priest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPriest, setSelectedPriest] = useState<Priest | null>(null);
 
   useEffect(() => {
     fetchPriests();
@@ -34,6 +36,7 @@ export const PriestSection: React.FC = () => {
   const otherPriests = priests.slice(1);
 
   return (
+    <>
     <section id="priest" className="py-10 md:py-16 bg-white overflow-hidden border-t border-stone-200/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -42,10 +45,10 @@ export const PriestSection: React.FC = () => {
             <Church className="h-3.5 w-3.5 text-[#c5a059]" />
             <span>Clero paroquial</span>
           </div>
-          <h2 className="institutional-title">
+          <h2 className="institutional-title text-balance">
             Nossos Sacerdotes
           </h2>
-          <p className="text-stone-600 text-sm sm:text-base font-light">
+          <p className="text-pretty text-stone-600 text-sm sm:text-base font-light">
             Conheça os sacerdotes dedicados ao cuidado pastoral e espiritual da nossa paróquia.
           </p>
         </div>
@@ -92,9 +95,17 @@ export const PriestSection: React.FC = () => {
                 )}
               </div>
 
-              <p className="text-stone-700 text-sm sm:text-base leading-relaxed font-light">
+              <p className="text-pretty text-stone-700 text-sm sm:text-base leading-relaxed font-light">
                 {mainPriest.short_bio || 'Dedicado ao anúncio do Evangelho e ao acolhimento de toda a comunidade paroquial.'}
               </p>
+              <button
+                type="button"
+                onClick={() => setSelectedPriest(mainPriest)}
+                className="inline-flex items-center gap-2 rounded-md bg-[#611a1a] px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#4b1212] focus:outline-none focus:ring-2 focus:ring-[#c5a059] focus:ring-offset-2"
+              >
+                Conhecer o pároco
+                <ChevronRight className="size-4" />
+              </button>
             </div>
           </div>
         </motion.div>
@@ -103,13 +114,15 @@ export const PriestSection: React.FC = () => {
         {otherPriests.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {otherPriests.map((priest, idx) => (
-              <motion.div
+              <motion.button
+                type="button"
                 key={priest.id}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: idx * 0.05 }}
-                className="bg-[#faf7f2] rounded-2xl p-5 border border-stone-200/80 hover:border-[#c5a059] shadow-sm flex items-center gap-4 transition-all"
+                onClick={() => setSelectedPriest(priest)}
+                className="bg-[#faf7f2] rounded-xl p-5 border border-stone-200/80 hover:border-[#c5a059] shadow-sm flex items-center gap-4 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-[#c5a059] focus:ring-offset-2"
               >
                 <div className="w-16 h-16 rounded-xl overflow-hidden border border-[#c5a059]/50 shrink-0 bg-stone-100">
                   {priest.photo_url ? (
@@ -134,11 +147,26 @@ export const PriestSection: React.FC = () => {
                     </p>
                   )}
                 </div>
-              </motion.div>
+                <ChevronRight className="ml-auto size-4 shrink-0 text-stone-400" />
+              </motion.button>
             ))}
           </div>
         )}
       </div>
     </section>
+    <PriestDetailsDialog
+      open={Boolean(selectedPriest)}
+      name={selectedPriest?.name || ''}
+      title={selectedPriest?.title}
+      photoUrl={selectedPriest?.photo_url}
+      description={selectedPriest?.full_bio || selectedPriest?.short_bio}
+      metadata={selectedPriest ? [
+        selectedPriest.ordination_year ? `Ordenação sacerdotal: ${selectedPriest.ordination_year}` : '',
+        selectedPriest.parish_since ? `Na paróquia desde ${selectedPriest.parish_since}` : '',
+      ].filter(Boolean) : []}
+      videoUrl={selectedPriest?.video_url}
+      onClose={() => setSelectedPriest(null)}
+    />
+    </>
   );
 };
